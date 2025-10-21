@@ -41,10 +41,10 @@ public class VistaCrearEquipos extends JFrame {
         JButton btnVolver = crearBotonConIcono("VOLVER AL MENU", new Color(100, 100, 100), "");
         
         // Agregar funcionalidad a los botones
-        btnCrearHeroes.addActionListener(_ -> abrirCreadorHeroes());
-        btnCrearEnemigos.addActionListener(_ -> abrirCreadorEnemigos());
-        btnVerEquipos.addActionListener(_ -> mostrarEquipos());
-        btnVolver.addActionListener(_ -> dispose());
+        btnCrearHeroes.addActionListener(e -> abrirCreadorHeroes());
+        btnCrearEnemigos.addActionListener(e -> abrirCreadorEnemigos());
+        btnVerEquipos.addActionListener(e -> mostrarEquipos());
+        btnVolver.addActionListener(e -> dispose());
         
         contentPanel.add(btnCrearHeroes);
         contentPanel.add(btnCrearEnemigos);
@@ -214,26 +214,110 @@ public class VistaCrearEquipos extends JFrame {
     }
     
     private void abrirCreadorEnemigos() {
-        String[] tiposEnemigos = {"GOLEM", "ORCO", "TROLL", "NOMUERTO", "DRAGON"};
-        
         for (int i = 0; i < 5; i++) {
             if (equipoEnemigos[i] == null) {
-                String tipo = (String) JOptionPane.showInputDialog(this,
-                    "Selecciona el tipo de enemigo para la posición " + (i + 1) + ":",
-                    "Crear Enemigo",
-                    JOptionPane.QUESTION_MESSAGE,
-                    null,
-                    tiposEnemigos,
-                    tiposEnemigos[0]);
+                String tipoEnemigo = mostrarSelectorEnemigoConImagenes(i + 1);
                 
-                if (tipo != null) {
-                    equipoEnemigos[i] = "Enemigo " + (i + 1) + " (" + tipo + ")";
+                if (tipoEnemigo != null) {
+                    equipoEnemigos[i] = "Enemigo " + (i + 1) + " (" + tipoEnemigo + ")";
                     JOptionPane.showMessageDialog(this, "Enemigo creado en la posicion " + (i + 1));
                 } else {
                     break;
                 }
             }
         }
+    }
+    
+    private String mostrarSelectorEnemigoConImagenes(int posicion) {
+        String[] tiposEnemigos = {"GOLEM", "ORCO", "TROLL", "NOMUERTO", "DRAGON"};
+        String[] tipoSeleccionado = {null};
+        
+        JDialog dialog = new JDialog((Frame) SwingUtilities.getWindowAncestor(this), "Seleccionar Enemigo - Posicion " + posicion, true);
+        dialog.setLayout(new BorderLayout());
+        dialog.setSize(600, 400);
+        
+        // Panel principal con fondo rojo oscuro
+        JPanel panelPrincipal = new JPanel(new GridBagLayout());
+        panelPrincipal.setBackground(new Color(80, 20, 20));
+        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+        
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10);
+        
+        // Titulo
+        JLabel titulo = new JLabel("Selecciona un tipo de Enemigo");
+        titulo.setFont(new Font("Arial", Font.BOLD, 18));
+        titulo.setForeground(Color.WHITE);
+        titulo.setHorizontalAlignment(SwingConstants.CENTER);
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        gbc.gridwidth = 3;
+        panelPrincipal.add(titulo, gbc);
+        
+        // Botones de enemigos
+        gbc.gridwidth = 1;
+        for (int i = 0; i < tiposEnemigos.length; i++) {
+            String tipo = tiposEnemigos[i];
+            
+            JButton btnEnemigo = new JButton();
+            btnEnemigo.setPreferredSize(new Dimension(120, 120));
+            btnEnemigo.setBackground(new Color(120, 40, 40));
+            btnEnemigo.setBorder(BorderFactory.createLineBorder(new Color(200, 60, 60), 2));
+            btnEnemigo.setFocusPainted(false);
+            
+            // Cargar imagen del enemigo
+            ImageIcon imagenEnemigo = ImagenUtil.obtenerImagenEnemigoBoton(tipo);
+            if (imagenEnemigo != null) {
+                btnEnemigo.setIcon(imagenEnemigo);
+            }
+            
+            // Texto del boton
+            btnEnemigo.setText("<html><center>" + tipo + "</center></html>");
+            btnEnemigo.setForeground(Color.WHITE);
+            btnEnemigo.setFont(new Font("Arial", Font.BOLD, 12));
+            btnEnemigo.setVerticalTextPosition(SwingConstants.BOTTOM);
+            btnEnemigo.setHorizontalTextPosition(SwingConstants.CENTER);
+            
+            // Hover effect
+            btnEnemigo.addMouseListener(new java.awt.event.MouseAdapter() {
+                public void mouseEntered(java.awt.event.MouseEvent evt) {
+                    btnEnemigo.setBackground(new Color(160, 60, 60));
+                }
+                public void mouseExited(java.awt.event.MouseEvent evt) {
+                    btnEnemigo.setBackground(new Color(120, 40, 40));
+                }
+            });
+            
+            btnEnemigo.addActionListener(e -> {
+                tipoSeleccionado[0] = tipo;
+                dialog.dispose();
+            });
+            
+            gbc.gridx = i % 3;
+            gbc.gridy = (i / 3) + 1;
+            panelPrincipal.add(btnEnemigo, gbc);
+        }
+        
+        // Boton cancelar
+        JButton btnCancelar = new JButton("Cancelar");
+        btnCancelar.setPreferredSize(new Dimension(100, 30));
+        btnCancelar.setBackground(new Color(100, 30, 30));
+        btnCancelar.setForeground(Color.WHITE);
+        btnCancelar.setBorder(BorderFactory.createLineBorder(new Color(150, 50, 50)));
+        btnCancelar.setFocusPainted(false);
+        btnCancelar.addActionListener(e -> dialog.dispose());
+        
+        gbc.gridx = 0;
+        gbc.gridy = 3;
+        gbc.gridwidth = 3;
+        gbc.anchor = GridBagConstraints.CENTER;
+        panelPrincipal.add(btnCancelar, gbc);
+        
+        dialog.add(panelPrincipal, BorderLayout.CENTER);
+        dialog.setLocationRelativeTo(this);
+        dialog.setVisible(true);
+        
+        return tipoSeleccionado[0];
     }
     
     private void mostrarEquipos() {

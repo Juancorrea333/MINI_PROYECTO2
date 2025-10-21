@@ -7,7 +7,7 @@ import java.io.IOException;
 
 public class ImagenUtil {
     
-    private static final String RUTA_IMAGENES = "Files/src/dqs/utilidades/";
+    private static final String RUTA_IMAGENES = "../Files/src/dqs/utilidades/";
     
     // Mapeo de tipos de heroes con sus imagenes
     public static ImageIcon obtenerImagenHeroe(String tipoHeroe) {
@@ -31,6 +31,60 @@ public class ImagenUtil {
         }
         
         return cargarImagenRedimensionada(nombreArchivo, 64, 64);
+    }
+    
+    // Metodo para obtener imagenes de enemigos
+    public static ImageIcon obtenerImagenEnemigo(String tipoEnemigo) {
+        String nombreArchivo = "";
+        
+        switch (tipoEnemigo.toUpperCase()) {
+            case "ORCO":
+                nombreArchivo = "dibuja un orco.png";
+                break;
+            case "TROLL":
+                nombreArchivo = "dibuja un troll.png";
+                break;
+            case "DRAGON":
+                nombreArchivo = "dragon.png";
+                break;
+            case "NOMUERTO":
+                nombreArchivo = "Dibuja un nomuerto.png";
+                break;
+            case "GOLEM":
+                nombreArchivo = "golem de piedra para.png";
+                break;
+            default:
+                return crearIconoTexto(tipoEnemigo);
+        }
+        
+        return cargarImagenRedimensionada(nombreArchivo, 64, 64);
+    }
+    
+    // Obtener imagen de enemigo más pequeña para botones
+    public static ImageIcon obtenerImagenEnemigoBoton(String tipoEnemigo) {
+        String nombreArchivo = "";
+        
+        switch (tipoEnemigo.toUpperCase()) {
+            case "ORCO":
+                nombreArchivo = "dibuja un orco.png";
+                break;
+            case "TROLL":
+                nombreArchivo = "dibuja un troll.png";
+                break;
+            case "DRAGON":
+                nombreArchivo = "dragon.png";
+                break;
+            case "NOMUERTO":
+                nombreArchivo = "Dibuja un nomuerto.png";
+                break;
+            case "GOLEM":
+                nombreArchivo = "golem de piedra para.png";
+                break;
+            default:
+                return crearIconoTexto(tipoEnemigo);
+        }
+        
+        return cargarImagenRedimensionada(nombreArchivo, 32, 32);
     }
     
     // Obtener imagen más pequeña para botones

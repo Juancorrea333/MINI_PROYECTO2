@@ -98,8 +98,9 @@ public class MenuPrincipal extends JFrame {
     }
 
     private void iniciarBatalla() {
-        VistaIniciarBatalla vistaIniciarBatalla = new VistaIniciarBatalla();
+        VistaIniciarBatallaNueva vistaIniciarBatalla = new VistaIniciarBatallaNueva();
         vistaIniciarBatalla.setVisible(true);
+        this.setVisible(false);
     }
 
     private void probarMecanicas() {

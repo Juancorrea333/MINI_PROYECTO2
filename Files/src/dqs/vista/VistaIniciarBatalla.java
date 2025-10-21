@@ -2,11 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 
 public class VistaIniciarBatalla extends JFrame {
-    private JProgressBar barraVidaHeroe1, barraVidaHeroe2;
-    private JProgressBar barraVidaEnemigo1, barraVidaEnemigo2;
-    private JTextArea logBatalla;
-    private JLabel lblTurno;
-    private int turnoActual = 1;
+    private String[] equipoHeroes;
+    private String[] equipoEnemigos;
+    private BatallaManager batallaManager;
+    private JPanel panelEstado;
+    private JTextArea areaLog;
+    private JButton btnIniciarBatalla;
+    private JButton btnCargarEquipos;
+    private JButton btnVolverMenu;
     
     public VistaIniciarBatalla() {
         inicializarComponentes();

@@ -1,15 +1,11 @@
-import javax.swing.*;
 import java.awt.*;
+import javax.swing.*;
 
 public class VistaIniciarBatalla extends JFrame {
-    private String[] equipoHeroes;
-    private String[] equipoEnemigos;
-    private BatallaManager batallaManager;
-    private JPanel panelEstado;
-    private JTextArea areaLog;
-    private JButton btnIniciarBatalla;
-    private JButton btnCargarEquipos;
-    private JButton btnVolverMenu;
+    private JProgressBar barraVidaEnemigo1; // Solo se usa esta para la simulación
+    private JTextArea logBatalla;
+    private JLabel lblTurno;
+    private int turnoActual = 1;
     
     public VistaIniciarBatalla() {
         inicializarComponentes();
@@ -132,11 +128,11 @@ public class VistaIniciarBatalla extends JFrame {
         barraVida.setForeground(Color.GREEN);
         barraVida.setBackground(Color.DARK_GRAY);
         
-        // Guardar referencias para actualizar despues
-        if (esHeroe && nombre.equals("Aragorn")) barraVidaHeroe1 = barraVida;
-        if (esHeroe && nombre.equals("Gandalf")) barraVidaHeroe2 = barraVida;
+        // Guardar referencias para actualizar despues (actualmente solo se usa barraVidaEnemigo1)
+        // if (esHeroe && nombre.equals("Aragorn")) barraVidaHeroe1 = barraVida;
+        // if (esHeroe && nombre.equals("Gandalf")) barraVidaHeroe2 = barraVida;
         if (!esHeroe && nombre.contains("Golem")) barraVidaEnemigo1 = barraVida;
-        if (!esHeroe && nombre.contains("Dragon")) barraVidaEnemigo2 = barraVida;
+        // if (!esHeroe && nombre.contains("Dragon")) barraVidaEnemigo2 = barraVida;
         
         panel.add(lblNombre);
         panel.add(lblTipo);
@@ -161,17 +157,22 @@ public class VistaIniciarBatalla extends JFrame {
         logBatalla.setBackground(new Color(15, 15, 25));
         logBatalla.setForeground(Color.WHITE);
         logBatalla.setEditable(false);
-        logBatalla.setText("Batalla iniciada!\n" +
-                          "Los heroes se enfrentan a poderosos enemigos...\n\n" +
-                          "Turno 1:\n" +
-                          "• Aragorn ataca al Golem de Piedra por 45 de daño\n" +
-                          "• Golem contraataca a Aragorn por 38 de daño\n" +
-                          "• Gandalf lanza Bola de Fuego al Dragon por 62 de daño\n" +
-                          "• Dragon usa Aliento de Fuego en area por 55 de daño\n\n" +
-                          "Turno 2:\n" +
-                          "• Legolas cura a Aragorn por 35 HP\n" +
-                          "• Aragorn usa Golpe Poderoso al Golem por 68 de daño\n" +
-                          "• Golem esta gravemente herido...\n\n");
+        logBatalla.setText("""
+                          Batalla iniciada!
+                          Los heroes se enfrentan a poderosos enemigos...
+                          
+                          Turno 1:
+                          • Aragorn ataca al Golem de Piedra por 45 de daño
+                          • Golem contraataca a Aragorn por 38 de daño
+                          • Gandalf lanza Bola de Fuego al Dragon por 62 de daño
+                          • Dragon usa Aliento de Fuego en area por 55 de daño
+                          
+                          Turno 2:
+                          • Legolas cura a Aragorn por 35 HP
+                          • Aragorn usa Golpe Poderoso al Golem por 68 de daño
+                          • Golem esta gravemente herido...
+                          
+                          """);
         
         JScrollPane scrollPane = new JScrollPane(logBatalla);
         scrollPane.setPreferredSize(new Dimension(400, 0));
@@ -191,10 +192,10 @@ public class VistaIniciarBatalla extends JFrame {
         JButton btnPausarBatalla = crearBoton("Pausar", new Color(130, 130, 70));
         JButton btnTerminarBatalla = crearBoton("Volver al Menu", new Color(70, 70, 130));
         
-        btnSiguienteTurno.addActionListener(_ -> siguienteTurno());
-        btnAutoPlayBatalla.addActionListener(_ -> autoBatalla());
-        btnPausarBatalla.addActionListener(_ -> pausarBatalla());
-        btnTerminarBatalla.addActionListener(_ -> dispose());
+        btnSiguienteTurno.addActionListener(e -> siguienteTurno());
+        btnAutoPlayBatalla.addActionListener(e -> autoBatalla());
+        btnPausarBatalla.addActionListener(e -> pausarBatalla());
+        btnTerminarBatalla.addActionListener(e -> dispose());
         
         panel.add(btnSiguienteTurno);
         panel.add(btnAutoPlayBatalla);
@@ -217,7 +218,7 @@ public class VistaIniciarBatalla extends JFrame {
     
     private void simularBatalla() {
         // Simular daño inicial en las barras de vida
-        Timer timer = new Timer(1000, _ -> {
+        Timer timer = new Timer(1000, e -> {
             if (barraVidaEnemigo1 != null && barraVidaEnemigo1.getValue() > 100) {
                 barraVidaEnemigo1.setValue(barraVidaEnemigo1.getValue() - 15);
                 barraVidaEnemigo1.setString(barraVidaEnemigo1.getValue() + "/" + barraVidaEnemigo1.getMaximum() + " HP");
@@ -245,17 +246,20 @@ public class VistaIniciarBatalla extends JFrame {
     
     private void autoBatalla() {
         JOptionPane.showMessageDialog(this,
-            "Modo Auto-Batalla activado\n" +
-            "La batalla continuara automaticamente cada 2 segundos.\n\n" +
-            "Puedes pausar en cualquier momento.",
+            """
+            Modo Auto-Batalla activado
+            La batalla continuara automaticamente cada 2 segundos.
+            
+            Puedes pausar en cualquier momento.""",
             "Auto-Batalla",
             JOptionPane.INFORMATION_MESSAGE);
     }
     
     private void pausarBatalla() {
         JOptionPane.showMessageDialog(this,
-            "Batalla pausada\n" +
-            "Usa 'Siguiente Turno' para continuar manualmente.",
+            """
+            Batalla pausada
+            Usa 'Siguiente Turno' para continuar manualmente.""",
             "Batalla Pausada",
             JOptionPane.INFORMATION_MESSAGE);
     }

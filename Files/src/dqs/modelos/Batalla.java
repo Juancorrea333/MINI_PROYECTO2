@@ -1,3 +1,5 @@
+package dqs.modelos;
+
 public class Batalla {
 
     private final Heroe[] equipoHeroes;

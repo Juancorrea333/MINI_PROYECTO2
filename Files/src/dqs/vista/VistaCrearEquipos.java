@@ -1,9 +1,10 @@
-import javax.swing.*;
+package dqs.vista;
 import java.awt.*;
+import javax.swing.*;
 
 public class VistaCrearEquipos extends JFrame {
-    private String[] equipoHeroes;
-    private String[] equipoEnemigos;
+    private final String[] equipoHeroes;
+    private final String[] equipoEnemigos;
     
     public VistaCrearEquipos() {
         equipoHeroes = new String[5];
@@ -82,9 +83,11 @@ public class VistaCrearEquipos extends JFrame {
         
         // Efecto hover
         boton.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
             public void mouseEntered(java.awt.event.MouseEvent evt) {
                 boton.setBackground(colorFondo.brighter());
             }
+            @Override
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 boton.setBackground(colorFondo);
             }
@@ -161,7 +164,7 @@ public class VistaCrearEquipos extends JFrame {
             botonHeroe.add(labelTipo, BorderLayout.SOUTH);
             
             // Acción del botón
-            botonHeroe.addActionListener(e -> {
+            botonHeroe.addActionListener(_ -> {
                 tipoSeleccionado[0] = tipo;
                 botonHeroe.setBackground(new Color(0, 120, 215));
                 botonHeroe.setBorder(BorderFactory.createLineBorder(new Color(0, 100, 200), 3));
@@ -182,7 +185,7 @@ public class VistaCrearEquipos extends JFrame {
         btnConfirmar.setBackground(new Color(0, 150, 0));
         btnConfirmar.setForeground(Color.WHITE);
         btnConfirmar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnConfirmar.addActionListener(e -> {
+        btnConfirmar.addActionListener(_ -> {
             if (tipoSeleccionado[0] != null) {
                 dialog.dispose();
             } else {
@@ -194,7 +197,7 @@ public class VistaCrearEquipos extends JFrame {
         btnCancelar.setBackground(new Color(150, 0, 0));
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnCancelar.addActionListener(e -> {
+        btnCancelar.addActionListener(_ -> {
             tipoSeleccionado[0] = null;
             dialog.dispose();
         });
@@ -326,19 +329,21 @@ public class VistaCrearEquipos extends JFrame {
         
         sb.append("EQUIPO DE HEROES:\n");
         for (int i = 0; i < equipoHeroes.length; i++) {
+            sb.append(i + 1);
             if (equipoHeroes[i] != null) {
-                sb.append((i + 1) + ". " + equipoHeroes[i] + "\n");
+                sb.append(". ").append(equipoHeroes[i]).append("\n");
             } else {
-                sb.append((i + 1) + ". [Vacio]\n");
+                sb.append(". [Vacio]\n");
             }
         }
         
         sb.append("\nEQUIPO DE ENEMIGOS:\n");
         for (int i = 0; i < equipoEnemigos.length; i++) {
+            sb.append(i + 1);
             if (equipoEnemigos[i] != null) {
-                sb.append((i + 1) + ". " + equipoEnemigos[i] + "\n");
+                sb.append(". ").append(equipoEnemigos[i]).append("\n");
             } else {
-                sb.append((i + 1) + ". [Vacio]\n");
+                sb.append(". [Vacio]\n");
             }
         }
         

@@ -1,3 +1,5 @@
+package dqs.modelos;
+
 public enum Tipo_Heroe {
     MAGO(50, 100, 150, 300, 30, 40, 10, 25, "Utiliza hechizos poderosos para atacar a distancia"),
     DRUIDA(80, 160, 120, 250, 25, 40, 18, 35, "Controla la naturaleza y puede sanar a sus aliados"),

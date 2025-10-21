@@ -1,5 +1,7 @@
-import javax.swing.*;
+package dqs.vista;
+
 import java.awt.*;
+import javax.swing.*;
 
 public class VistaMostrarEquipos extends JFrame {
     
@@ -79,8 +81,8 @@ public class VistaMostrarEquipos extends JFrame {
         
         // Contenido simulado
         StringBuilder contenido = new StringBuilder();
-        contenido.append(titulo + "\n");
-        contenido.append("═".repeat(40) + "\n\n");
+        contenido.append(titulo).append("\n");
+        contenido.append("═".repeat(40)).append("\n\n");
         
         if (esHeroes) {
             contenido.append("1. Aragorn (GUERRERO)\n");
@@ -181,8 +183,9 @@ public class VistaMostrarEquipos extends JFrame {
     
     private void actualizarDatos() {
         JOptionPane.showMessageDialog(this, 
-            "Datos actualizados correctamente.\n" +
-            "Se han sincronizado todos los equipos registrados.", 
+            """
+            Datos actualizados correctamente.
+            Se han sincronizado todos los equipos registrados.""", 
             "Actualizacion Exitosa", 
             JOptionPane.INFORMATION_MESSAGE);
     }

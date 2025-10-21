@@ -1,3 +1,5 @@
+package dqs.modelos;
+
 public interface Sanador {
 
     void curar(Personaje objetivo);

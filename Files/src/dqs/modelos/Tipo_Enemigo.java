@@ -1,3 +1,5 @@
+package dqs.modelos;
+
 public enum Tipo_Enemigo {
     GOLEM(200, 400, 0, 0, 40, 60, 30, 50, "Criatura de piedra con gran fuerza y defensa"),
     ORCO(150, 300, 0, 0, 30, 50, 20, 40, "Guerrero salvaje y agresivo"),

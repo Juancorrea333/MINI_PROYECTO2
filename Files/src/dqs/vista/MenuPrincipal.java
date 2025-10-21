@@ -1,11 +1,11 @@
-import javax.swing.*;
-
+package dqs.vista;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class MenuPrincipal extends JFrame {
 
@@ -21,7 +21,7 @@ public class MenuPrincipal extends JFrame {
 
         // Cargar imagen de fondo
         try {
-            backgroundImage = ImageIO.read(new File("Files/src/dqs/utilidades/Fondo de menú princi.png"));
+            backgroundImage = ImageIO.read(new File("src/dqs/utilidades/Fondo de menú princi.png"));
         } catch (IOException e) {
             System.err.println("⚠️ No se pudo cargar la imagen de fondo: " + e.getMessage());
         }
@@ -33,16 +33,19 @@ public class MenuPrincipal extends JFrame {
                 super.paintComponent(g);
                 if (backgroundImage != null) {
                     g.drawImage(backgroundImage, 0, 0, getWidth(), getHeight(), this);
+                } else {
+                    g.setColor(new Color(20, 30, 50));
+                    g.fillRect(0, 0, getWidth(), getHeight());
                 }
             }
         };
         backgroundPanel.setLayout(new GridBagLayout());
-        backgroundPanel.setOpaque(false);
+        backgroundPanel.setOpaque(true);
 
         // Título
         JLabel titulo = new JLabel("MENÚ PRINCIPAL");
         titulo.setFont(new Font("SansSerif", Font.BOLD, 26));
-        titulo.setForeground(Color.WHITE);
+        titulo.setForeground(Color.BLACK);
 
         // Crear botones estilo flat
         JButton btnCrear = crearBoton("1. Crear Equipos");
@@ -90,58 +93,94 @@ public class MenuPrincipal extends JFrame {
     // Métodos temporales para funcionalidad de botones
     private void abrirVentanaCrearEquipos() {
         JOptionPane.showMessageDialog(this, 
-            "🛡️ Función 'Crear Equipos' en desarrollo.\n" +
-            "Próximamente podrás crear y personalizar tus equipos.", 
+            """
+            🛡️ Función 'Crear Equipos' en desarrollo.
+            Próximamente podrás crear y personalizar tus equipos.""", 
             "Crear Equipos", 
             JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void mostrarEquipos() {
         JOptionPane.showMessageDialog(this, 
-            "👥 Función 'Mostrar Equipos' en desarrollo.\n" +
-            "Aquí podrás ver todos los equipos creados.", 
+            """
+            👥 Función 'Mostrar Equipos' en desarrollo.
+            Aquí podrás ver todos los equipos creados.""", 
             "Mostrar Equipos", 
             JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void iniciarBatalla() {
         JOptionPane.showMessageDialog(this, 
-            "⚔️ Función 'Iniciar Batalla' en desarrollo.\n" +
-            "¡Prepárate para épicas batallas de Dragon Quest!", 
+            """
+            ⚔️ Función 'Iniciar Batalla' en desarrollo.
+            ¡Prepárate para épicas batallas de Dragon Quest!""", 
             "Iniciar Batalla", 
             JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void probarMecanicas() {
         JOptionPane.showMessageDialog(this, 
-            "🧪 Función 'Prueba de Mecánicas' en desarrollo.\n" +
-            "Aquí podrás probar las mecánicas del juego.", 
+            """
+            🧪 Función 'Prueba de Mecánicas' en desarrollo.
+            Aquí podrás probar las mecánicas del juego.""", 
             "Prueba de Mecánicas", 
             JOptionPane.INFORMATION_MESSAGE);
     }
 
     private JButton crearBoton(String texto) {
-        JButton boton = new JButton(texto);
+        JButton boton = new JButton(texto) {
+            boolean hover = false;
+            
+            @Override
+            protected void paintComponent(Graphics g) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                
+                // Dibujar fondo
+                if (hover) {
+                    g2.setColor(new Color(255, 255, 150)); // Amarillo brillante
+                } else {
+                    g2.setColor(new Color(0, 0, 0, 180)); // Negro semi-transparente
+                }
+                g2.fillRect(0, 0, getWidth(), getHeight());
+                
+                // Dibujar texto
+                g2.setFont(getFont());
+                g2.setColor(hover ? Color.BLACK : Color.WHITE);
+                FontMetrics fm = g2.getFontMetrics();
+                int x = (getWidth() - fm.stringWidth(getText())) / 2;
+                int y = ((getHeight() - fm.getHeight()) / 2) + fm.getAscent();
+                g2.drawString(getText(), x, y);
+                
+                g2.dispose();
+            }
+            
+            {
+                addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseEntered(MouseEvent e) {
+                        hover = true;
+                        setBorder(BorderFactory.createLineBorder(new Color(255, 215, 0), 3));
+                        repaint();
+                    }
+
+                    @Override
+                    public void mouseExited(MouseEvent e) {
+                        hover = false;
+                        setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
+                        repaint();
+                    }
+                });
+            }
+        };
+        
         boton.setFocusPainted(false);
-        boton.setFont(new Font("SansSerif", Font.PLAIN, 18));
-        boton.setForeground(Color.WHITE);
-        boton.setBackground(new Color(0, 0, 0, 0)); // Transparente
-        boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+        boton.setFont(new Font("SansSerif", Font.BOLD, 18));
+        boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
+        boton.setContentAreaFilled(false);
+        boton.setOpaque(false);
+        boton.setPreferredSize(new Dimension(300, 50));
 
-        // Efecto hover
-        boton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                boton.setForeground(new Color(255, 255, 150));
-                boton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 150), 2));
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                boton.setForeground(Color.WHITE);
-                boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
-            }
-        });
         return boton;
     }
 

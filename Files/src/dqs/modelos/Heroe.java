@@ -1,5 +1,3 @@
-package dqs.modelos;
-
 import java.util.Scanner;
 
 public class Heroe extends Personaje implements Sanador, Tanque {

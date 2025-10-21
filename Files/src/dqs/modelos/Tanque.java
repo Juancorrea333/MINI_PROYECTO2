@@ -1,5 +1,3 @@
-package dqs.modelos;
-
 public interface Tanque {
 
     void defender(Personaje aliado);

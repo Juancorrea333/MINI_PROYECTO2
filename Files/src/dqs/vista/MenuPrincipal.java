@@ -20,9 +20,9 @@ public class MenuPrincipal extends JFrame {
 
         // Cargar imagen de fondo
         try {
-            backgroundImage = ImageIO.read(new File("src/dqs/utilidades/Fondo de menú princi.png"));
+            backgroundImage = ImageIO.read(new File("Files/src/dqs/utilidades/Fondo de menú princi.png"));
         } catch (IOException e) {
-            System.err.println("⚠️ No se pudo cargar la imagen de fondo: " + e.getMessage());
+            System.err.println("No se pudo cargar la imagen de fondo: " + e.getMessage());
         }
 
         // Panel personalizado con fondo
@@ -47,7 +47,7 @@ public class MenuPrincipal extends JFrame {
         JButton btnCrear = crearBoton("1. Crear Equipos");
         JButton btnMostrar = crearBoton("2. Mostrar Equipos");
         JButton btnBatalla = crearBoton("3. Iniciar Batalla");
-        JButton btnPruebas = crearBoton("4. Prueba de Mecánicas");
+        JButton btnPruebas = crearBoton("4. Prueba de Mecanicas");
         JButton btnSalir = crearBoton("5. Salir");
 
         // Layout con espaciado vertical
@@ -77,13 +77,34 @@ public class MenuPrincipal extends JFrame {
         add(backgroundPanel, BorderLayout.CENTER);
 
         // Acción básica para "Salir"
-        btnSalir.addActionListener(e -> { e.getSource(); System.exit(0); });
+        btnSalir.addActionListener(_ -> System.exit(0));
 
-        // TODO: Agregar listeners a los demás botones cuando se integren las vistas
-        // btnCrear.addActionListener(e -> abrirVentanaCrearEquipos());
-        // btnMostrar.addActionListener(e -> mostrarEquipos());
-        // btnBatalla.addActionListener(e -> iniciarBatalla());
-        // btnPruebas.addActionListener(e -> probarMecanicas());
+        // Listeners para los demás botones
+        btnCrear.addActionListener(_ -> abrirVentanaCrearEquipos());
+        btnMostrar.addActionListener(_ -> mostrarEquipos());
+        btnBatalla.addActionListener(_ -> iniciarBatalla());
+        btnPruebas.addActionListener(_ -> probarMecanicas());
+    }
+
+    // Metodos de navegacion entre vistas
+    private void abrirVentanaCrearEquipos() {
+        VistaCrearEquipos vistaCrearEquipos = new VistaCrearEquipos();
+        vistaCrearEquipos.setVisible(true);
+    }
+
+    private void mostrarEquipos() {
+        VistaMostrarEquipos vistaMostrarEquipos = new VistaMostrarEquipos();
+        vistaMostrarEquipos.setVisible(true);
+    }
+
+    private void iniciarBatalla() {
+        VistaIniciarBatalla vistaIniciarBatalla = new VistaIniciarBatalla();
+        vistaIniciarBatalla.setVisible(true);
+    }
+
+    private void probarMecanicas() {
+        VistaPruebaMecanicas vistaPruebaMecanicas = new VistaPruebaMecanicas();
+        vistaPruebaMecanicas.setVisible(true);
     }
 
     private JButton crearBoton(String texto) {
@@ -91,21 +112,27 @@ public class MenuPrincipal extends JFrame {
         boton.setFocusPainted(false);
         boton.setFont(new Font("SansSerif", Font.PLAIN, 18));
         boton.setForeground(Color.WHITE);
-        boton.setBackground(new Color(0, 0, 0, 0)); // Transparente
+        boton.setBackground(new Color(0, 0, 0, 120)); // Semi-transparente negro
         boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+        boton.setOpaque(false);
+        boton.setContentAreaFilled(true);
 
         // Efecto hover
         boton.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseEntered(MouseEvent e) {
                 boton.setForeground(new Color(255, 255, 150));
+                boton.setBackground(new Color(50, 50, 0, 150)); // Fondo dorado semi-transparente
                 boton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 150), 2));
+                boton.repaint(); // Forzar repintado
             }
 
             @Override
             public void mouseExited(MouseEvent e) {
                 boton.setForeground(Color.WHITE);
+                boton.setBackground(new Color(0, 0, 0, 120)); // Volver al fondo original
                 boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+                boton.repaint(); // Forzar repintado
             }
         });
         return boton;

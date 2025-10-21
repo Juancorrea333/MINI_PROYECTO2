@@ -1,5 +1,3 @@
-package dqs.modelos;
-
 public abstract class Personaje {
     protected String nombre;
     protected int hp;

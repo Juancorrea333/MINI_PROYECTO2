@@ -1,9 +1,10 @@
-import javax.swing.*;
+package dqs.vista;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class ImagenUtil {
     
@@ -11,23 +12,16 @@ public class ImagenUtil {
     
     // Mapeo de tipos de heroes con sus imagenes
     public static ImageIcon obtenerImagenHeroe(String tipoHeroe) {
-        String nombreArchivo = "";
+        String nombreArchivo = switch (tipoHeroe.toUpperCase()) {
+            case "MAGO" -> "Un mago de videojueg.png";
+            case "DRUIDA" -> "Un druida teriantrop.png";
+            case "GUERRERO" -> "Un guerrero de video.png";
+            case "PALADIN" -> "Un paladín de videoj.png";
+            default -> "";
+        };
         
-        switch (tipoHeroe.toUpperCase()) {
-            case "MAGO":
-                nombreArchivo = "Un mago de videojueg.png";
-                break;
-            case "DRUIDA":
-                nombreArchivo = "Un druida teriantrop.png";
-                break;
-            case "GUERRERO":
-                nombreArchivo = "Un guerrero de video.png";
-                break;
-            case "PALADIN":
-                nombreArchivo = "Un paladín de videoj.png";
-                break;
-            default:
-                return crearIconoTexto(tipoHeroe);
+        if (nombreArchivo.isEmpty()) {
+            return crearIconoTexto(tipoHeroe);
         }
         
         return cargarImagenRedimensionada(nombreArchivo, 64, 64);
@@ -35,23 +29,16 @@ public class ImagenUtil {
     
     // Obtener imagen más pequeña para botones
     public static ImageIcon obtenerImagenHeroeBoton(String tipoHeroe) {
-        String nombreArchivo = "";
+        String nombreArchivo = switch (tipoHeroe.toUpperCase()) {
+            case "MAGO" -> "Un mago de videojueg.png";
+            case "DRUIDA" -> "Un druida teriantrop.png";
+            case "GUERRERO" -> "Un guerrero de video.png";
+            case "PALADIN" -> "Un paladín de videoj.png";
+            default -> "";
+        };
         
-        switch (tipoHeroe.toUpperCase()) {
-            case "MAGO":
-                nombreArchivo = "Un mago de videojueg.png";
-                break;
-            case "DRUIDA":
-                nombreArchivo = "Un druida teriantrop.png";
-                break;
-            case "GUERRERO":
-                nombreArchivo = "Un guerrero de video.png";
-                break;
-            case "PALADIN":
-                nombreArchivo = "Un paladín de videoj.png";
-                break;
-            default:
-                return crearIconoTexto(tipoHeroe);
+        if (nombreArchivo.isEmpty()) {
+            return crearIconoTexto(tipoHeroe);
         }
         
         return cargarImagenRedimensionada(nombreArchivo, 32, 32);
@@ -103,34 +90,34 @@ public class ImagenUtil {
         g2d.setColor(color);
         
         switch (tipo.toLowerCase()) {
-            case "crear":
+            case "crear" -> {
                 // Dibujar un simbolo de mas (+)
                 g2d.setStroke(new BasicStroke(3));
                 g2d.drawLine(12, 6, 12, 18);
                 g2d.drawLine(6, 12, 18, 12);
-                break;
-            case "ver":
+            }
+            case "ver" -> {
                 // Dibujar un ojo
                 g2d.fillOval(6, 9, 12, 6);
                 g2d.setColor(Color.WHITE);
                 g2d.fillOval(10, 11, 4, 2);
-                break;
-            case "batalla":
+            }
+            case "batalla" -> {
                 // Dibujar espadas cruzadas
                 g2d.setStroke(new BasicStroke(2));
                 g2d.drawLine(6, 6, 18, 18);
                 g2d.drawLine(18, 6, 6, 18);
-                break;
-            case "mecanicas":
+            }
+            case "mecanicas" -> {
                 // Dibujar engranaje
                 g2d.fillOval(8, 8, 8, 8);
                 g2d.setColor(Color.WHITE);
                 g2d.fillOval(10, 10, 4, 4);
-                break;
-            default:
+            }
+            default -> {
                 // Icono generico - cuadrado
                 g2d.fillRoundRect(4, 4, 16, 16, 4, 4);
-                break;
+            }
         }
         
         g2d.dispose();

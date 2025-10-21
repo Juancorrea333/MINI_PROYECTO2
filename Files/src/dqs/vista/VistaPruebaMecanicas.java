@@ -1,5 +1,7 @@
-import javax.swing.*;
+package dqs.vista;
+
 import java.awt.*;
+import javax.swing.*;
 
 public class VistaPruebaMecanicas extends JFrame {
     
@@ -105,14 +107,19 @@ public class VistaPruebaMecanicas extends JFrame {
         resultados.setBackground(new Color(15, 20, 25));
         resultados.setForeground(new Color(0, 255, 0));
         resultados.setEditable(false);
-        resultados.setText("=== SISTEMA DE COMBATE ===\n\n" +
-                          "Selecciona una mecánica para probarla:\n\n" +
-                          "• Ataque Básico: Daño estándar sin costo de MP\n" +
-                          "• Ataque Especial: Mayor daño con costo de MP\n" +
-                          "• Defensa: Reduce daño recibido significativamente\n" +
-                          "• Esquivar: Posibilidad de evitar daño completamente\n" +
-                          "• Golpe Crítico: Daño multiplicado por suerte\n" +
-                          "• Combo: Múltiples ataques en secuencia\n\n");
+        resultados.setText("""
+                          === SISTEMA DE COMBATE ===
+                          
+                          Selecciona una mecánica para probarla:
+                          
+                          • Ataque Básico: Daño estándar sin costo de MP
+                          • Ataque Especial: Mayor daño con costo de MP
+                          • Defensa: Reduce daño recibido significativamente
+                          • Esquivar: Posibilidad de evitar daño completamente
+                          • Golpe Crítico: Daño multiplicado por suerte
+                          • Combo: Múltiples ataques en secuencia
+                          
+                          """);
         
         JScrollPane scroll = new JScrollPane(resultados);
         panel.add(scroll, BorderLayout.CENTER);
@@ -159,10 +166,10 @@ public class VistaPruebaMecanicas extends JFrame {
     
     private void actualizarHabilidades(JTextArea area, String tipo) {
         StringBuilder sb = new StringBuilder();
-        sb.append("=== HABILIDADES DE " + tipo + " ===\n\n");
+        sb.append("=== HABILIDADES DE ").append(tipo).append(" ===\n\n");
         
         switch (tipo) {
-            case "MAGO":
+            case "MAGO" -> {
                 sb.append("🔥 Bola de Fuego (MP: 12)\n");
                 sb.append("   Daño: 60-80 | Área: 1 enemigo\n\n");
                 sb.append("❄️ Ventisca (MP: 18)\n");
@@ -171,8 +178,8 @@ public class VistaPruebaMecanicas extends JFrame {
                 sb.append("   Daño: 70-90 | Paraliza 2 turnos\n\n");
                 sb.append("🌟 Meteoro (MP: 35)\n");
                 sb.append("   Daño: 120-160 | Área masiva\n");
-                break;
-            case "DRUIDA":
+            }
+            case "DRUIDA" -> {
                 sb.append("🌿 Curar (MP: 8)\n");
                 sb.append("   Restaura: 40-60 HP | 1 aliado\n\n");
                 sb.append("🌙 Regeneración (MP: 12)\n");
@@ -181,8 +188,8 @@ public class VistaPruebaMecanicas extends JFrame {
                 sb.append("   Restaura: 25-35 HP | Todos los aliados\n\n");
                 sb.append("☘️ Revivir (MP: 25)\n");
                 sb.append("   Revive aliado con 50% HP\n");
-                break;
-            case "GUERRERO":
+            }
+            case "GUERRERO" -> {
                 sb.append("⚔️ Golpe Poderoso (MP: 5)\n");
                 sb.append("   Daño: ATK x 1.5 | 95% precisión\n\n");
                 sb.append("🔄 Giro de Espada (MP: 10)\n");
@@ -191,8 +198,8 @@ public class VistaPruebaMecanicas extends JFrame {
                 sb.append("   +50% ATK por 3 turnos\n\n");
                 sb.append("🛡️ Provocar (MP: 3)\n");
                 sb.append("   Fuerza enemigos a atacarte\n");
-                break;
-            case "PALADIN":
+            }
+            case "PALADIN" -> {
                 sb.append("✨ Golpe Santo (MP: 10)\n");
                 sb.append("   Daño: ATK x 1.3 + curación propia\n\n");
                 sb.append("🛡️ Escudo Sagrado (MP: 12)\n");
@@ -201,7 +208,7 @@ public class VistaPruebaMecanicas extends JFrame {
                 sb.append("   Daño masivo vs enemigos no-muertos\n\n");
                 sb.append("🌟 Bendición (MP: 15)\n");
                 sb.append("   +25% stats a todos los aliados\n");
-                break;
+            }
         }
         
         area.setText(sb.toString());
@@ -224,14 +231,15 @@ public class VistaPruebaMecanicas extends JFrame {
         positivos.setBackground(new Color(25, 35, 25));
         
         JTextArea textPositivos = new JTextArea(
-            "🔺 AUMENTAR ATK: +25% daño por 5 turnos\n" +
-            "🛡️ AUMENTAR DEF: +30% defensa por 4 turnos\n" +
-            "⚡ AUMENTAR VEL: +20% velocidad por 3 turnos\n" +
-            "💚 REGENERACIÓN: +15 HP por turno\n" +
-            "💙 RECUPERAR MP: +10 MP por turno\n" +
-            "🌟 BENDICIÓN: +15% a todos los stats\n" +
-            "🔮 CONCENTRACIÓN: Próximo hechizo x2 poder\n" +
-            "⚔️ FURIA: +50% ATK, -20% DEF por 3 turnos"
+            """
+            🔺 AUMENTAR ATK: +25% daño por 5 turnos
+            🛡️ AUMENTAR DEF: +30% defensa por 4 turnos
+            ⚡ AUMENTAR VEL: +20% velocidad por 3 turnos
+            💚 REGENERACIÓN: +15 HP por turno
+            💙 RECUPERAR MP: +10 MP por turno
+            🌟 BENDICIÓN: +15% a todos los stats
+            🔮 CONCENTRACIÓN: Próximo hechizo x2 poder
+            ⚔️ FURIA: +50% ATK, -20% DEF por 3 turnos"""
         );
         textPositivos.setFont(new Font("Consolas", Font.PLAIN, 11));
         textPositivos.setBackground(new Color(20, 30, 20));
@@ -252,14 +260,15 @@ public class VistaPruebaMecanicas extends JFrame {
         negativos.setBackground(new Color(35, 25, 25));
         
         JTextArea textNegativos = new JTextArea(
-            "🔻 DEBILITAR ATK: -30% daño por 4 turnos\n" +
-            "💔 DEBILITAR DEF: -25% defensa por 5 turnos\n" +
-            "🐌 LENTITUD: -40% velocidad por 3 turnos\n" +
-            "🩸 VENENO: -12 HP por turno por 6 turnos\n" +
-            "⚡ PARÁLISIS: No puede actuar por 2 turnos\n" +
-            "😴 SUEÑO: No puede actuar hasta recibir daño\n" +
-            "🌪️ CONFUSIÓN: 50% chance de atacar aliados\n" +
-            "❄️ CONGELADO: No puede moverse por 1 turno"
+            """
+            🔻 DEBILITAR ATK: -30% daño por 4 turnos
+            💔 DEBILITAR DEF: -25% defensa por 5 turnos
+            🐌 LENTITUD: -40% velocidad por 3 turnos
+            🩸 VENENO: -12 HP por turno por 6 turnos
+            ⚡ PARÁLISIS: No puede actuar por 2 turnos
+            😴 SUEÑO: No puede actuar hasta recibir daño
+            🌪️ CONFUSIÓN: 50% chance de atacar aliados
+            ❄️ CONGELADO: No puede moverse por 1 turno"""
         );
         textNegativos.setFont(new Font("Consolas", Font.PLAIN, 11));
         textNegativos.setBackground(new Color(30, 20, 20));
@@ -314,12 +323,17 @@ public class VistaPruebaMecanicas extends JFrame {
         resultados.setBackground(new Color(15, 20, 30));
         resultados.setForeground(new Color(255, 215, 0));
         resultados.setEditable(false);
-        resultados.setText("=== CALCULADORA DE DAÑO ===\n\n" +
-                          "Ingresa los valores y presiona 'Calcular Daño'\n\n" +
-                          "Fórmula: (Ataque + Nivel/2 + Bono%) - Defensa\n" +
-                          "Daño mínimo: 1\n" +
-                          "Crítico: x2.5 (8% probabilidad)\n\n" +
-                          "Esperando cálculo...\n");
+        resultados.setText("""
+                          === CALCULADORA DE DAÑO ===
+                          
+                          Ingresa los valores y presiona 'Calcular Daño'
+                          
+                          Fórmula: (Ataque + Nivel/2 + Bono%) - Defensa
+                          Daño mínimo: 1
+                          Crítico: x2.5 (8% probabilidad)
+                          
+                          Esperando cálculo...
+                          """);
         
         JScrollPane scroll = new JScrollPane(resultados);
         panel.add(scroll, BorderLayout.CENTER);
@@ -337,14 +351,14 @@ public class VistaPruebaMecanicas extends JFrame {
                 
                 StringBuilder resultado = new StringBuilder();
                 resultado.append("=== RESULTADO DEL CÁLCULO ===\n\n");
-                resultado.append("Ataque: " + ataque + "\n");
-                resultado.append("Defensa: " + defensa + "\n");
-                resultado.append("Nivel: " + nivel + "\n");
-                resultado.append("Bono: " + bono + "%\n\n");
-                resultado.append("Daño Normal: " + dañoBase + "\n");
-                resultado.append("Daño Crítico: " + dañoCritico + "\n\n");
-                resultado.append("Rango de Daño: " + (dañoBase - 5) + " - " + (dañoBase + 10) + "\n");
-                resultado.append("Crítico (8%): " + dañoCritico + "\n");
+                resultado.append("Ataque: ").append(ataque).append("\n");
+                resultado.append("Defensa: ").append(defensa).append("\n");
+                resultado.append("Nivel: ").append(nivel).append("\n");
+                resultado.append("Bono: ").append(bono).append("%\n\n");
+                resultado.append("Daño Normal: ").append(dañoBase).append("\n");
+                resultado.append("Daño Crítico: ").append(dañoCritico).append("\n\n");
+                resultado.append("Rango de Daño: ").append(dañoBase - 5).append(" - ").append(dañoBase + 10).append("\n");
+                resultado.append("Crítico (8%): ").append(dañoCritico).append("\n");
                 
                 resultados.setText(resultado.toString());
             } catch (NumberFormatException e) {
@@ -402,18 +416,23 @@ public class VistaPruebaMecanicas extends JFrame {
     
     private void reiniciarPruebas() {
         JOptionPane.showMessageDialog(this,
-            "🔄 Todas las pruebas han sido reiniciadas\n" +
-            "Los logs y resultados se han limpiado.",
+            """
+            🔄 Todas las pruebas han sido reiniciadas
+            Los logs y resultados se han limpiado.""",
             "Pruebas Reiniciadas",
             JOptionPane.INFORMATION_MESSAGE);
     }
     
     private void guardarLog() {
-        JOptionPane.showMessageDialog(this,
-            "💾 Log de pruebas guardado exitosamente\n\n" +
-            "Archivo: logs/mecanicas_" + 
+        String archivo = "logs/mecanicas_" + 
             java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmm")) + 
-            ".log\n\n" +
+            ".log";
+        
+        JOptionPane.showMessageDialog(this,
+            """
+            \ud83d\udcbe Log de pruebas guardado exitosamente
+            
+            Archivo: """ + archivo + "\n\n" +
             "Incluye todas las pruebas realizadas en esta sesión.",
             "Log Guardado",
             JOptionPane.INFORMATION_MESSAGE);

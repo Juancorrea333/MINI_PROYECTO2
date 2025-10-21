@@ -1,10 +1,11 @@
-import javax.swing.*;
+package dqs.vista;
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
-import javax.imageio.ImageIO;
 import java.io.File;
 import java.io.IOException;
+import javax.imageio.ImageIO;
+import javax.swing.*;
 
 public class MenuPrincipal extends JFrame {
 
@@ -20,9 +21,31 @@ public class MenuPrincipal extends JFrame {
 
         // Cargar imagen de fondo
         try {
-            backgroundImage = ImageIO.read(new File("Files/src/dqs/utilidades/Fondo de menú princi.png"));
+            // Intentar múltiples rutas posibles
+            File imgFile = null;
+            String[] posiblesRutas = {
+                "src/dqs/utilidades/Fondo de menú princi.png",
+                "Files/src/dqs/utilidades/Fondo de menú princi.png",
+                "../src/dqs/utilidades/Fondo de menú princi.png",
+                "../../src/dqs/utilidades/Fondo de menú princi.png"
+            };
+            
+            for (String ruta : posiblesRutas) {
+                File f = new File(ruta);
+                if (f.exists()) {
+                    imgFile = f;
+                    break;
+                }
+            }
+            
+            if (imgFile != null) {
+                backgroundImage = ImageIO.read(imgFile);
+                System.out.println("✓ Imagen de fondo cargada desde: " + imgFile.getAbsolutePath());
+            } else {
+                System.err.println("⚠️ No se encontró la imagen de fondo en ninguna ruta conocida");
+            }
         } catch (IOException e) {
-            System.err.println("No se pudo cargar la imagen de fondo: " + e.getMessage());
+            System.err.println("⚠️ Error al cargar la imagen de fondo: " + e.getMessage());
         }
 
         // Panel personalizado con fondo

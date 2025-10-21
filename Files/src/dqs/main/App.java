@@ -1,22 +1,31 @@
 package dqs.main;
 
 import dqs.modelos.*;
+import dqs.vista.MenuPrincipal;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import javax.swing.SwingUtilities;
 
+/**
+ * Clase principal de la aplicación.
+ * NOTA: Esta clase contiene código legacy de consola que ya no se usa.
+ * La aplicación ahora se ejecuta completamente desde la interfaz gráfica.
+ */
 public class App {
     private static final Scanner scanner = new Scanner(System.in);
     private static final Batalla batalla = new Batalla();
 
     public static void main(String[] args) {
-        System.out.println("  ¡Bienvenido al Sistema de Batallas RPG!");
-        System.out.println("==========================================");
-        
-        mostrarMenuPrincipal();
+        // Lanzar la interfaz gráfica
+        SwingUtilities.invokeLater(() -> {
+            MenuPrincipal menu = new MenuPrincipal();
+            menu.setVisible(true);
+        });
     }
     
+    /* Método de consola antiguo - ahora se usa interfaz gráfica
     private static void mostrarMenuPrincipal() {
         while (true) {
             System.out.println("\n=== MENÚ PRINCIPAL ===");
@@ -42,7 +51,9 @@ public class App {
             }
         }
     }
+    */ // Fin del método de consola comentado
     
+    @SuppressWarnings("unused") // Código legacy de consola
     private static void menuCrearEquipos() {
         System.out.println("\n=== CREACIÓN DE EQUIPOS ===");
         System.out.println("1. Crear Equipo de Héroes");
@@ -102,6 +113,7 @@ public class App {
         }
     }
     
+    @SuppressWarnings("unused") // Código legacy de consola
     private static void iniciarBatalla() {
         // Verificar que ambos equipos tengan al menos un miembro
         boolean hayHeroes = false, hayEnemigos = false;
@@ -343,6 +355,7 @@ public class App {
         return false;
     }
     
+    @SuppressWarnings("unused") // Código legacy de consola
     private static void menuPruebaMecanicas() {
         System.out.println("\n=== PRUEBA DE MECÁNICAS ===");
         System.out.println("1. Prueba de Defensa del Tanque");

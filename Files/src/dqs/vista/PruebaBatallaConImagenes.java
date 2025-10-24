@@ -1,3 +1,5 @@
+package dqs.vista;
+
 import javax.swing.*;
 
 /** Pequeño runner para abrir la vista de batalla nueva y probar imágenes. */

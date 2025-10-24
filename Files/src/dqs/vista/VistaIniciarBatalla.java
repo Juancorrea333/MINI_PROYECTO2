@@ -1,3 +1,5 @@
+package dqs.vista;
+
 import java.awt.*;
 import javax.swing.*;
 

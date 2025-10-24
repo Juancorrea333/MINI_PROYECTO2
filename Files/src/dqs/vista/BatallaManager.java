@@ -1,4 +1,7 @@
+package dqs.vista;
+
 import javax.swing.*;
+import dqs.modelos.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -19,6 +22,7 @@ public class BatallaManager {
     private JLabel[] heroHealthBars;
     private JLabel[] enemyHealthBars;
     private Heroe heroeActual;
+    private int turnoActual;
     private boolean batallaEnCurso;
     
     /**
@@ -36,11 +40,13 @@ public class BatallaManager {
     }
     
     private void inicializarBarrasSalud() {
-        heroHealthBars = new JLabel[5];
-        enemyHealthBars = new JLabel[5];
+        heroHealthBars = new JLabel[4];
+        enemyHealthBars = new JLabel[3];
         
-        for (int i = 0; i < 5; i++) {
+        for (int i = 0; i < 4; i++) {
             heroHealthBars[i] = new JLabel("Héroe " + (i + 1) + ": [Vacío]");
+        }
+        for (int i = 0; i < 3; i++) {
             enemyHealthBars[i] = new JLabel("Enemigo " + (i + 1) + ": [Vacío]");
         }
     }

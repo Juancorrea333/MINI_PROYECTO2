@@ -3,8 +3,14 @@ package dqs.vista;
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * Vista para experimentar y probar mecánicas de combate, habilidades,
+ * estados y una calculadora de daño. Es útil para ajustar valores
+ * y ver efectos sin afectar la lógica principal del juego.
+ */
 public class VistaPruebaMecanicas extends JFrame {
     
+    /** Constructor: inicializa los componentes de prueba. */
     public VistaPruebaMecanicas() {
         inicializarComponentes();
     }
@@ -55,9 +61,9 @@ public class VistaPruebaMecanicas extends JFrame {
         JButton btnGuardarLog = crearBoton("Guardar Log", new Color(34, 139, 34));
         JButton btnVolver = crearBoton("Volver al Menu", new Color(178, 34, 34));
         
-        btnReiniciar.addActionListener(_ -> reiniciarPruebas());
-        btnGuardarLog.addActionListener(_ -> guardarLog());
-        btnVolver.addActionListener(_ -> dispose());
+        btnReiniciar.addActionListener(e -> reiniciarPruebas());
+        btnGuardarLog.addActionListener(e -> guardarLog());
+        btnVolver.addActionListener(e -> dispose());
         
         panelBotones.add(btnReiniciar);
         panelBotones.add(btnGuardarLog);
@@ -67,6 +73,7 @@ public class VistaPruebaMecanicas extends JFrame {
         add(mainPanel);
     }
     
+    /** Panel para probar distintas mecánicas de combate. */
     private JPanel crearPanelCombate() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(30, 35, 45));
@@ -85,12 +92,12 @@ public class VistaPruebaMecanicas extends JFrame {
         JButton btnCombo = crearBotonPrueba("Combo");
         
         // Agregar funcionalidad
-        btnAtaqueBasico.addActionListener(_ -> probarMecanica("Ataque Básico", "Daño: 45-60 | Precisión: 95%"));
-        btnAtaqueEspecial.addActionListener(_ -> probarMecanica("Ataque Especial", "Daño: 80-120 | Costo MP: 15"));
-        btnDefensa.addActionListener(_ -> probarMecanica("Defensa", "Reduce daño en 50% | +25% Bloqueo"));
-        btnEsquivar.addActionListener(_ -> probarMecanica("Esquivar", "Posibilidad: 15-30% | Depende de Velocidad"));
-        btnCritico.addActionListener(_ -> probarMecanica("Golpe Crítico", "Chance: 8% | Daño x2.5"));
-        btnCombo.addActionListener(_ -> probarMecanica("Combo", "2-4 ataques seguidos | Daño creciente"));
+        btnAtaqueBasico.addActionListener(e -> probarMecanica("Ataque Básico", "Daño: 45-60 | Precisión: 95%"));
+        btnAtaqueEspecial.addActionListener(e -> probarMecanica("Ataque Especial", "Daño: 80-120 | Costo MP: 15"));
+        btnDefensa.addActionListener(e -> probarMecanica("Defensa", "Reduce daño en 50% | +25% Bloqueo"));
+        btnEsquivar.addActionListener(e -> probarMecanica("Esquivar", "Posibilidad: 15-30% | Depende de Velocidad"));
+        btnCritico.addActionListener(e -> probarMecanica("Golpe Crítico", "Chance: 8% | Daño x2.5"));
+        btnCombo.addActionListener(e -> probarMecanica("Combo", "2-4 ataques seguidos | Daño creciente"));
         
         controles.add(btnAtaqueBasico);
         controles.add(btnAtaqueEspecial);
@@ -127,6 +134,7 @@ public class VistaPruebaMecanicas extends JFrame {
         return panel;
     }
     
+    /** Panel para explorar las habilidades disponibles por tipo. */
     private JPanel crearPanelHabilidades() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(30, 35, 45));
@@ -150,7 +158,7 @@ public class VistaPruebaMecanicas extends JFrame {
         habilidades.setForeground(new Color(173, 216, 230));
         habilidades.setEditable(false);
         
-        comboTipo.addActionListener(_ -> {
+        comboTipo.addActionListener(e -> {
             String tipo = (String) comboTipo.getSelectedItem();
             actualizarHabilidades(habilidades, tipo);
         });
@@ -164,6 +172,7 @@ public class VistaPruebaMecanicas extends JFrame {
         return panel;
     }
     
+    /** Rellena el area con la lista de habilidades del tipo seleccionado. */
     private void actualizarHabilidades(JTextArea area, String tipo) {
         StringBuilder sb = new StringBuilder();
         sb.append("=== HABILIDADES DE ").append(tipo).append(" ===\n\n");
@@ -214,6 +223,7 @@ public class VistaPruebaMecanicas extends JFrame {
         area.setText(sb.toString());
     }
     
+    /** Panel que muestra estados positivos y negativos disponibles. */
     private JPanel crearPanelEstados() {
         JPanel panel = new JPanel(new GridLayout(2, 1, 0, 10));
         panel.setBackground(new Color(30, 35, 45));
@@ -283,6 +293,7 @@ public class VistaPruebaMecanicas extends JFrame {
         return panel;
     }
     
+    /** Panel con una calculadora simple de daño para experimentar con fórmulas. */
     private JPanel crearPanelCalculadora() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(30, 35, 45));
@@ -339,7 +350,7 @@ public class VistaPruebaMecanicas extends JFrame {
         panel.add(scroll, BorderLayout.CENTER);
         
         // Funcionalidad botones
-        btnCalcular.addActionListener(_ -> {
+        btnCalcular.addActionListener(e -> {
             try {
                 int ataque = Integer.parseInt(txtAtaque.getText());
                 int defensa = Integer.parseInt(txtDefensa.getText());
@@ -361,12 +372,12 @@ public class VistaPruebaMecanicas extends JFrame {
                 resultado.append("Crítico (8%): ").append(dañoCritico).append("\n");
                 
                 resultados.setText(resultado.toString());
-            } catch (NumberFormatException e) {
-                resultados.setText("❌ ERROR: Ingresa solo números válidos");
+            } catch (NumberFormatException ex) {
+                resultados.setText("ERROR: Ingresa solo números válidos");
             }
         });
         
-        btnLimpiar.addActionListener(_ -> {
+        btnLimpiar.addActionListener(e -> {
             txtAtaque.setText("0");
             txtDefensa.setText("0");
             txtNivel.setText("1");
@@ -377,6 +388,7 @@ public class VistaPruebaMecanicas extends JFrame {
         return panel;
     }
     
+    /** Crea una etiqueta con estilo consistente para esta vista. */
     private JLabel crearLabel(String texto) {
         JLabel label = new JLabel(texto);
         label.setForeground(Color.WHITE);
@@ -384,6 +396,7 @@ public class VistaPruebaMecanicas extends JFrame {
         return label;
     }
     
+    /** Crea un botón pequeño usado en los paneles de prueba. */
     private JButton crearBotonPrueba(String texto) {
         JButton boton = new JButton(texto);
         boton.setFont(new Font("SansSerif", Font.BOLD, 11));
@@ -394,6 +407,7 @@ public class VistaPruebaMecanicas extends JFrame {
         return boton;
     }
     
+    /** Crea un botón con color personalizado y estilo estándar. */
     private JButton crearBoton(String texto, Color colorFondo) {
         JButton boton = new JButton(texto);
         boton.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -405,6 +419,7 @@ public class VistaPruebaMecanicas extends JFrame {
         return boton;
     }
     
+    /** Muestra un diálogo con la descripción de la mecánica probada. */
     private void probarMecanica(String mecanica, String descripcion) {
         JOptionPane.showMessageDialog(this,
             "🧪 PRUEBA DE MECÁNICA: " + mecanica + "\n\n" +
@@ -414,6 +429,7 @@ public class VistaPruebaMecanicas extends JFrame {
             JOptionPane.INFORMATION_MESSAGE);
     }
     
+    /** Reinicia el estado de las pruebas (simulado). */
     private void reiniciarPruebas() {
         JOptionPane.showMessageDialog(this,
             """
@@ -423,6 +439,7 @@ public class VistaPruebaMecanicas extends JFrame {
             JOptionPane.INFORMATION_MESSAGE);
     }
     
+    /** Guarda (simula) el log de las pruebas en un archivo. */
     private void guardarLog() {
         String archivo = "logs/mecanicas_" + 
             java.time.LocalDateTime.now().format(java.time.format.DateTimeFormatter.ofPattern("yyyyMMdd_HHmm")) + 

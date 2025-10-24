@@ -2,16 +2,23 @@ package dqs.vista;
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * Vista para crear y gestionar equipos de héroes y enemigos.
+ * Permite crear héroes/enemigos mediante selectores visuales y mostrar
+ * los equipos actualmente configurados.
+ */
 public class VistaCrearEquipos extends JFrame {
     private final String[] equipoHeroes;
     private final String[] equipoEnemigos;
     
+    /** Constructor: inicializa los arreglos y componentes visuales. */
     public VistaCrearEquipos() {
         equipoHeroes = new String[5];
         equipoEnemigos = new String[5];
         inicializarComponentes();
     }
     
+    /** Construye la interfaz gráfica: botones principales y layout. */
     private void inicializarComponentes() {
         setTitle("Dragon Quest VIII - Crear Equipos");
         setSize(800, 600);
@@ -64,6 +71,7 @@ public class VistaCrearEquipos extends JFrame {
         add(mainPanel);
     }
     
+    /** Crea un botón con icono opcional (usa ImagenUtil para iconos). */
     private JButton crearBotonConIcono(String texto, Color colorFondo, String tipoIcono) {
         JButton boton = new JButton(texto);
         boton.setFont(new Font("SansSerif", Font.BOLD, 16));
@@ -96,6 +104,7 @@ public class VistaCrearEquipos extends JFrame {
         return boton;
     }
     
+    /** Abre el flujo interactivo para crear hasta 5 héroes. */
     private void abrirCreadorHeroes() {
         for (int i = 0; i < 5; i++) {
             if (equipoHeroes[i] == null) {
@@ -114,6 +123,7 @@ public class VistaCrearEquipos extends JFrame {
         }
     }
     
+    /** Muestra un diálogo visual con opciones de héroes y devuelve el tipo elegido. */
     private String mostrarSelectorHeroeConImagenes(int posicion) {
         JDialog dialog = new JDialog(this, "Seleccionar Héroe - Posición " + posicion, true);
         dialog.setLayout(new BorderLayout());
@@ -164,7 +174,7 @@ public class VistaCrearEquipos extends JFrame {
             botonHeroe.add(labelTipo, BorderLayout.SOUTH);
             
             // Acción del botón
-            botonHeroe.addActionListener(_ -> {
+            botonHeroe.addActionListener(e -> {
                 tipoSeleccionado[0] = tipo;
                 botonHeroe.setBackground(new Color(0, 120, 215));
                 botonHeroe.setBorder(BorderFactory.createLineBorder(new Color(0, 100, 200), 3));
@@ -185,7 +195,7 @@ public class VistaCrearEquipos extends JFrame {
         btnConfirmar.setBackground(new Color(0, 150, 0));
         btnConfirmar.setForeground(Color.WHITE);
         btnConfirmar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnConfirmar.addActionListener(_ -> {
+        btnConfirmar.addActionListener(e -> {
             if (tipoSeleccionado[0] != null) {
                 dialog.dispose();
             } else {
@@ -197,7 +207,7 @@ public class VistaCrearEquipos extends JFrame {
         btnCancelar.setBackground(new Color(150, 0, 0));
         btnCancelar.setForeground(Color.WHITE);
         btnCancelar.setFont(new Font("Arial", Font.BOLD, 12));
-        btnCancelar.addActionListener(_ -> {
+        btnCancelar.addActionListener(e -> {
             tipoSeleccionado[0] = null;
             dialog.dispose();
         });
@@ -216,6 +226,7 @@ public class VistaCrearEquipos extends JFrame {
         return tipoSeleccionado[0];
     }
     
+    /** Abre el flujo para crear enemigos en el equipo (hasta 5). */
     private void abrirCreadorEnemigos() {
         for (int i = 0; i < 5; i++) {
             if (equipoEnemigos[i] == null) {
@@ -231,6 +242,7 @@ public class VistaCrearEquipos extends JFrame {
         }
     }
     
+    /** Muestra un diálogo visual con botones de enemigos y devuelve el tipo elegido. */
     private String mostrarSelectorEnemigoConImagenes(int posicion) {
         String[] tiposEnemigos = {"GOLEM", "ORCO", "TROLL", "NOMUERTO", "DRAGON"};
         String[] tipoSeleccionado = {null};
@@ -323,6 +335,7 @@ public class VistaCrearEquipos extends JFrame {
         return tipoSeleccionado[0];
     }
     
+    /** Muestra una ventana con el listado textual de los equipos actuales. */
     private void mostrarEquipos() {
         StringBuilder sb = new StringBuilder();
         sb.append("=== EQUIPOS CREADOS ===\n\n");

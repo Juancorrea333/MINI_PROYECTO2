@@ -1,6 +1,11 @@
 import javax.swing.*;
 import java.awt.*;
 
+/**
+ * Interfaz para gestionar batallas reales usando equipos cargados.
+ * Muestra el estado de los héroes/enemigos, un log de batalla y controles
+ * para cargar equipos e iniciar la simulación gestionada por BatallaManager.
+ */
 public class VistaIniciarBatallaNueva extends JFrame {
     private String[] equipoHeroes;
     private String[] equipoEnemigos;
@@ -11,12 +16,14 @@ public class VistaIniciarBatallaNueva extends JFrame {
     private JButton btnCargarEquipos;
     private JButton btnVolverMenu;
     
+    /** Constructor: prepara la UI y arrays de equipos. */
     public VistaIniciarBatallaNueva() {
         inicializarComponentes();
-        equipoHeroes = new String[5];
-        equipoEnemigos = new String[5];
+        equipoHeroes = new String[4];
+        equipoEnemigos = new String[3];
     }
     
+    /** Construye los paneles, log y botones de la vista. */
     private void inicializarComponentes() {
         setTitle("Dragon Quest VIII - Batalla Real");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -74,6 +81,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
         setVisible(true);
     }
     
+    /** Inicializa los paneles de estado (placeholders para imágenes y texto). */
     private void inicializarPanelEstado() {
         // Primera fila - Héroes
         for (int i = 0; i < 5; i++) {
@@ -118,6 +126,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
         }
     }
     
+    /** Crea y devuelve el panel de controles (cargar, iniciar, volver). */
     private JPanel crearPanelControles() {
         JPanel panel = new JPanel(new FlowLayout());
         panel.setBackground(new Color(20, 20, 30));
@@ -151,6 +160,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
         return panel;
     }
     
+    /** Abre un diálogo para pegar/listar los equipos de héroes y enemigos. */
     private void cargarEquipos() {
         // Crear diálogo para cargar equipos
         JDialog dialog = new JDialog(this, "Cargar Equipos", true);
@@ -268,6 +278,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
         dialog.setVisible(true);
     }
     
+    /** Comprueba si hay al menos un héroe y un enemigo cargados. */
     private boolean verificarEquipos() {
         boolean hayHeroes = false, hayEnemigos = false;
         
@@ -288,6 +299,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
         return hayHeroes && hayEnemigos;
     }
     
+    /** Actualiza la UI de estado con imágenes y textos basados en los equipos actuales. */
     private void actualizarPanelEstado() {
         Component[] componentes = panelEstado.getComponents();
         
@@ -358,6 +370,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
         }
     }
     
+    /** Configura las barras de salud y delega el control a BatallaManager. */
     private void iniciarBatalla() {
         if (!verificarEquipos()) {
             JOptionPane.showMessageDialog(this,
@@ -399,6 +412,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
         batallaManager.iniciarBatallaConEquipos(equipoHeroes, equipoEnemigos);
     }
     
+    /** Extrae y normaliza el tipo del héroe desde el string completo. */
     private String extraerTipoHeroe(String heroeCompleto) {
         // Extrae el tipo entre paréntesis, ej: "Aragorn (GUERRERO)" -> "GUERRERO"
         if (heroeCompleto.contains("(") && heroeCompleto.contains(")")) {
@@ -427,6 +441,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
         return "GUERRERO"; // Por defecto
     }
     
+    /** Extrae y normaliza el tipo del enemigo desde el string completo. */
     private String extraerTipoEnemigo(String enemigoCompleto) {
         // Extrae el tipo entre paréntesis, ej: "Orco Salvaje (ORCO)" -> "ORCO"
         if (enemigoCompleto.contains("(") && enemigoCompleto.contains(")")) {
@@ -455,6 +470,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
         return "ORCO"; // Por defecto
     }
     
+    /** Cierra la vista y vuelve al menú anterior. */
     private void volverAlMenu() {
         dispose();
     }

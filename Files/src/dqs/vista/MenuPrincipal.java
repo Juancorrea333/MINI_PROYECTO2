@@ -1,4 +1,5 @@
 package dqs.vista;
+
 import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.*;
@@ -7,10 +8,18 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+/**
+ * Ventana principal del juego.
+ * Contiene el menú de navegación hacia las distintas vistas (crear equipos,
+ * mostrar equipos, iniciar batalla y pruebas de mecánicas).
+ * Esta clase se encarga únicamente de la interfaz; la lógica de juego
+ * reside en las clases del paquete `dqs.modelos` y en `BatallaManager`.
+ */
 public class MenuPrincipal extends JFrame {
 
     private BufferedImage backgroundImage;
 
+    /** Constructor: inicializa la ventana y componentes visuales. */
     public MenuPrincipal() {
         setTitle("Dragon Quest VIII - Menú Principal");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -99,17 +108,19 @@ public class MenuPrincipal extends JFrame {
 
         add(backgroundPanel, BorderLayout.CENTER);
 
-        // Acción básica para "Salir"
-        btnSalir.addActionListener(_ -> System.exit(0));
+    // Acción básica para "Salir"
+    btnSalir.addActionListener(e -> System.exit(0));}
 
-        // Listeners para los demás botones
-        btnCrear.addActionListener(_ -> abrirVentanaCrearEquipos());
-        btnMostrar.addActionListener(_ -> mostrarEquipos());
-        btnBatalla.addActionListener(_ -> iniciarBatalla());
-        btnPruebas.addActionListener(_ -> probarMecanicas());
+    // Listeners para los demás botones
+    /* 
+    btnCrear.addActionListener(e -> abrirVentanaCrearEquipos());
+    btnMostrar.addActionListener(e -> mostrarEquipos());
+    btnBatalla.addActionListener(e -> iniciarBatalla());
+    btnPruebas.addActionListener(e -> probarMecanicas());
     }
-
+*/
     // Metodos de navegacion entre vistas
+    /* 
     private void abrirVentanaCrearEquipos() {
         VistaCrearEquipos vistaCrearEquipos = new VistaCrearEquipos();
         vistaCrearEquipos.setVisible(true);
@@ -129,8 +140,9 @@ public class MenuPrincipal extends JFrame {
     private void probarMecanicas() {
         VistaPruebaMecanicas vistaPruebaMecanicas = new VistaPruebaMecanicas();
         vistaPruebaMecanicas.setVisible(true);
-    }
+    }*/
 
+    /** Crea un botón estilizado usado por el menú principal. */
     private JButton crearBoton(String texto) {
         JButton boton = new JButton(texto);
         boton.setFocusPainted(false);
@@ -162,6 +174,7 @@ public class MenuPrincipal extends JFrame {
         return boton;
     }
 
+    /** Punto de entrada para ejecutar únicamente la ventana del menú. */
     public static void main(String[] args) {
         SwingUtilities.invokeLater(() -> {
             MenuPrincipal menu = new MenuPrincipal();

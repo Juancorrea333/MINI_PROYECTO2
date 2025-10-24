@@ -1,17 +1,24 @@
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * Vista de demostración de batalla (simulación rápida).
+ * Esta clase proporciona una UI simplificada para visualizar barras de vida,
+ * un log de batalla y controles básicos. No maneja la lógica real de combate.
+ */
 public class VistaIniciarBatalla extends JFrame {
     private JProgressBar barraVidaEnemigo1; // Solo se usa esta para la simulación
     private JTextArea logBatalla;
     private JLabel lblTurno;
     private int turnoActual = 1;
     
+    /** Constructor: inicializa la UI y ejecuta una simulación automática. */
     public VistaIniciarBatalla() {
         inicializarComponentes();
         simularBatalla();
     }
     
+    /** Construye todos los paneles y componentes de la ventana. */
     private void inicializarComponentes() {
         setTitle("Dragon Quest VIII - Batalla Épica");
         setSize(1100, 750);
@@ -66,6 +73,7 @@ public class VistaIniciarBatalla extends JFrame {
         add(mainPanel);
     }
     
+    /** Crea el panel lateral que contiene los personajes (héroes o enemigos). */
     private JPanel crearPanelEquipoBatalla(String titulo, boolean esHeroes) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -99,6 +107,7 @@ public class VistaIniciarBatalla extends JFrame {
         return panel;
     }
     
+    /** Crea el panel que representa un personaje con barra de vida. */
     private JPanel crearPersonajeBatalla(String nombre, String tipo, int hpActual, int hpMaximo, boolean esHeroe) {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
@@ -142,6 +151,7 @@ public class VistaIniciarBatalla extends JFrame {
         return panel;
     }
     
+    /** Crea el panel central con el log de batalla (texto). */
     private JPanel crearPanelLog() {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBorder(BorderFactory.createTitledBorder(
@@ -182,6 +192,7 @@ public class VistaIniciarBatalla extends JFrame {
         return panel;
     }
     
+    /** Crea los controles inferiores (siguiente turno, autoplay, etc.). */
     private JPanel crearPanelControles() {
         JPanel panel = new JPanel(new FlowLayout());
         panel.setBackground(new Color(30, 30, 45));
@@ -216,6 +227,7 @@ public class VistaIniciarBatalla extends JFrame {
         return boton;
     }
     
+    /** Simulación simple que reduce la vida de un enemigo periódicamente. */
     private void simularBatalla() {
         // Simular daño inicial en las barras de vida
         Timer timer = new Timer(1000, e -> {
@@ -227,6 +239,7 @@ public class VistaIniciarBatalla extends JFrame {
         timer.start();
     }
     
+    /** Avanza la simulación un turno y agrega una entrada al log. */
     private void siguienteTurno() {
         turnoActual++;
         lblTurno.setText("Turno " + turnoActual);
@@ -244,6 +257,7 @@ public class VistaIniciarBatalla extends JFrame {
         logBatalla.setCaretPosition(logBatalla.getDocument().getLength());
     }
     
+    /** Muestra información sobre el modo de auto-batalla. */
     private void autoBatalla() {
         JOptionPane.showMessageDialog(this,
             """
@@ -255,6 +269,7 @@ public class VistaIniciarBatalla extends JFrame {
             JOptionPane.INFORMATION_MESSAGE);
     }
     
+    /** Muestra un mensaje indicando que la batalla está pausada. */
     private void pausarBatalla() {
         JOptionPane.showMessageDialog(this,
             """

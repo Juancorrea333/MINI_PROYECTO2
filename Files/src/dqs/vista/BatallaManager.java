@@ -5,23 +5,32 @@ import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Administrador de la lógica de la batalla y la interacción con la UI.
+ *
+ * Recibe referencias a la ventana principal y al área de log para mostrar
+ * mensajes durante la batalla. Orquesta turnos de héroes y enemigos y
+ * actualiza las barras de salud mostradas en la interfaz.
+ */
 public class BatallaManager {
     private JFrame parentFrame;
-    private JPanel logPanel;
     private JTextArea logArea;
     private Batalla batalla;
     private JLabel[] heroHealthBars;
     private JLabel[] enemyHealthBars;
     private Heroe heroeActual;
-    private int turnoActual;
     private boolean batallaEnCurso;
     
+    /**
+     * Constructor.
+     * @param parent ventana padre usada para diálogos
+     * @param logPanel panel opcional (no usado internamente actualmente)
+     * @param logArea área de texto donde se escribirán los mensajes de batalla
+     */
     public BatallaManager(JFrame parent, JPanel logPanel, JTextArea logArea) {
         this.parentFrame = parent;
-        this.logPanel = logPanel;
         this.logArea = logArea;
         this.batalla = new Batalla();
-        this.turnoActual = 0;
         this.batallaEnCurso = false;
         inicializarBarrasSalud();
     }
@@ -36,6 +45,7 @@ public class BatallaManager {
         }
     }
     
+    /** Inicia la batalla construyendo héroes y enemigos desde los arrays dados. */
     public void iniciarBatallaConEquipos(String[] heroes, String[] enemigos) {
         // Resetear batalla
         batalla = new Batalla();
@@ -78,6 +88,7 @@ public class BatallaManager {
         iniciarTurnoHeroe();
     }
     
+    /** Crea una instancia de Heroe a partir de un string con formato 'Nombre (TIPO)'. */
     private Heroe crearHeroeDesdeString(String heroeString, int numero) {
         try {
             // Formato: "Nombre (TIPO)"
@@ -115,6 +126,7 @@ public class BatallaManager {
         return null;
     }
     
+    /** Crea una instancia de Enemigo a partir de un string con formato 'Nombre (TIPO)'. */
     private Enemigo crearEnemigoDesdeString(String enemigoString, int numero) {
         try {
             // Formato: "Nombre (TIPO)"
@@ -132,6 +144,7 @@ public class BatallaManager {
         return null;
     }
     
+    /** Verifica que exista al menos un héroe y un enemigo en sus equipos. */
     private boolean verificarEquiposValidos() {
         boolean hayHeroes = false, hayEnemigos = false;
         
@@ -152,6 +165,7 @@ public class BatallaManager {
         return hayHeroes && hayEnemigos;
     }
     
+    /** Muestra en el log el estado inicial de héroes y enemigos. */
     private void mostrarEstadoInicial() {
         agregarLogMensaje("\n=== ESTADO INICIAL ===");
         
@@ -176,6 +190,7 @@ public class BatallaManager {
         }
     }
     
+    /** Inicia el turno del siguiente héroe vivo y muestra su menú de acciones. */
     private void iniciarTurnoHeroe() {
         if (!batallaEnCurso) return;
         
@@ -202,6 +217,7 @@ public class BatallaManager {
         mostrarMenuAcciones();
     }
     
+    /** Muestra un diálogo modal con las acciones disponibles para el héroe actual. */
     private void mostrarMenuAcciones() {
         JDialog dialogAcciones = new JDialog(parentFrame, "Acciones de " + heroeActual.getNombre(), true);
         dialogAcciones.setLayout(new GridBagLayout());
@@ -296,6 +312,7 @@ public class BatallaManager {
         dialogAcciones.setVisible(true);
     }
     
+    /** Crea un botón estilizado para las acciones del héroe. */
     private JButton crearBotonAccion(String texto, Color color) {
         JButton boton = new JButton(texto);
         boton.setBackground(color);
@@ -306,10 +323,12 @@ public class BatallaManager {
         return boton;
     }
     
+    /** Atajo para mostrar el selector de enemigos con la acción 'atacar'. */
     private void mostrarSeleccionEnemigo() {
         mostrarSeleccionEnemigo("atacar");
     }
     
+    /** Muestra lista de enemigos vivos y ejecuta la acción seleccionada. */
     private void mostrarSeleccionEnemigo(String accion) {
         List<Enemigo> enemigosVivos = new ArrayList<>();
         for (Enemigo enemigo : batalla.getEquipoEnemigos()) {
@@ -353,6 +372,7 @@ public class BatallaManager {
         }
     }
     
+    /** Muestra lista de aliados (vivos o caídos) según la acción y ejecuta la selección. */
     private void mostrarSeleccionAliado(String accion) {
         List<Heroe> heroesDisponibles = new ArrayList<>();
         
@@ -405,6 +425,7 @@ public class BatallaManager {
         }
     }
     
+    /** Ejecuta la acción seleccionada contra un enemigo objetivo. */
     private void ejecutarAccionContraEnemigo(String accion, Enemigo objetivo) {
         switch (accion) {
             case "atacar":
@@ -421,6 +442,7 @@ public class BatallaManager {
         finalizarTurnoHeroe();
     }
     
+    /** Ejecuta la acción seleccionada sobre un aliado objetivo. */
     private void ejecutarAccionConAliado(String accion, Heroe objetivo) {
         switch (accion) {
             case "defender":
@@ -445,6 +467,7 @@ public class BatallaManager {
         finalizarTurnoHeroe();
     }
     
+    /** Finaliza el turno del héroe y pone en marcha el turno enemigo / siguiente héroe. */
     private void finalizarTurnoHeroe() {
         // Verificar victoria
         if (verificarVictoria()) return;
@@ -461,6 +484,7 @@ public class BatallaManager {
         timer.start();
     }
     
+    /** Ejecuta las acciones de los enemigos (IA simple) contra héroes vivos. */
     private void ejecutarTurnoEnemigos() {
         agregarLogMensaje("\n=== TURNO DE LOS ENEMIGOS ===");
         
@@ -486,6 +510,7 @@ public class BatallaManager {
         actualizarBarrasSalud();
     }
     
+    /** Comprueba condiciones de victoria/derrota y finaliza la batalla si procede. */
     private boolean verificarVictoria() {
         boolean heroesVivos = false, enemigosVivos = false;
         
@@ -514,6 +539,7 @@ public class BatallaManager {
         return false;
     }
     
+    /** Finaliza la batalla, registra el resultado y muestra un diálogo informativo. */
     private void finalizarBatalla(String resultado) {
         batallaEnCurso = false;
         agregarLogMensaje("\n=== FIN DE LA BATALLA ===");
@@ -523,6 +549,7 @@ public class BatallaManager {
             JOptionPane.INFORMATION_MESSAGE);
     }
     
+    /** Actualiza las etiquetas que muestran HP/MP y estado (vivo/muerto). */
     private void actualizarBarrasSalud() {
         // Actualizar barras de héroes
         Heroe[] heroes = batalla.getEquipoHeroes();
@@ -555,6 +582,7 @@ public class BatallaManager {
         }
     }
     
+    /** Añade un mensaje al área de log de forma segura en el hilo de Swing. */
     private void agregarLogMensaje(String mensaje) {
         SwingUtilities.invokeLater(() -> {
             logArea.append(mensaje + "\n");

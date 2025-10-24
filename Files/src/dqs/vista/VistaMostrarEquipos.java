@@ -3,8 +3,14 @@ package dqs.vista;
 import java.awt.*;
 import javax.swing.*;
 
+/**
+ * Vista para mostrar los equipos registrados y estadísticas.
+ * Incluye pestañas para héroes, enemigos y estadísticas, y botones
+ * para actualizar/exportar los datos.
+ */
 public class VistaMostrarEquipos extends JFrame {
     
+    /** Constructor: prepara la UI para mostrar los equipos. */
     public VistaMostrarEquipos() {
         inicializarComponentes();
     }
@@ -55,9 +61,9 @@ public class VistaMostrarEquipos extends JFrame {
         JButton btnExportar = crearBoton("Exportar");
         JButton btnVolver = crearBoton("Volver");
         
-        btnActualizar.addActionListener(_ -> actualizarDatos());
-        btnExportar.addActionListener(_ -> exportarEquipos());
-        btnVolver.addActionListener(_ -> dispose());
+        btnActualizar.addActionListener(e -> actualizarDatos());
+        btnExportar.addActionListener(e -> exportarEquipos());
+        btnVolver.addActionListener(e -> dispose());
         
         buttonPanel.add(btnActualizar);
         buttonPanel.add(btnExportar);
@@ -67,6 +73,7 @@ public class VistaMostrarEquipos extends JFrame {
         add(mainPanel);
     }
     
+    /** Crea un panel con el listado textual del equipo (heroes o enemigos). */
     private JPanel crearPanelEquipo(String titulo, boolean esHeroes) {
         JPanel panel = new JPanel(new BorderLayout());
         panel.setBackground(new Color(35, 35, 55));
@@ -134,6 +141,7 @@ public class VistaMostrarEquipos extends JFrame {
         return panel;
     }
     
+    /** Crea el panel que muestra tarjetas con estadísticas resumidas. */
     private JPanel crearPanelEstadisticas() {
         JPanel panel = new JPanel(new GridLayout(2, 2, 15, 15));
         panel.setBackground(new Color(35, 35, 55));
@@ -148,6 +156,7 @@ public class VistaMostrarEquipos extends JFrame {
         return panel;
     }
     
+    /** Genera una tarjeta visual para una estadística concreta. */
     private JPanel crearTarjetaEstadistica(String titulo, String valor, Color color) {
         JPanel tarjeta = new JPanel(new BorderLayout());
         tarjeta.setBackground(new Color(50, 50, 70));
@@ -170,6 +179,7 @@ public class VistaMostrarEquipos extends JFrame {
         return tarjeta;
     }
     
+    /** Crea botones estilizados usados en esta vista. */
     private JButton crearBoton(String texto) {
         JButton boton = new JButton(texto);
         boton.setFont(new Font("SansSerif", Font.BOLD, 12));
@@ -181,6 +191,7 @@ public class VistaMostrarEquipos extends JFrame {
         return boton;
     }
     
+    /** Acción simulada para actualizar datos (placeholder). */
     private void actualizarDatos() {
         JOptionPane.showMessageDialog(this, 
             """
@@ -190,6 +201,7 @@ public class VistaMostrarEquipos extends JFrame {
             JOptionPane.INFORMATION_MESSAGE);
     }
     
+    /** Simula la exportación de equipos en distintos formatos. */
     private void exportarEquipos() {
         String[] opciones = {"Archivo de Texto", "Hoja de Calculo", "Base de Datos"};
         String seleccion = (String) JOptionPane.showInputDialog(this,

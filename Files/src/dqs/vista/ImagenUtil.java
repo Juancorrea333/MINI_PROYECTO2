@@ -6,11 +6,16 @@ import java.io.IOException;
 import javax.imageio.ImageIO;
 import javax.swing.*;
 
+/**
+ * Utilidades para cargar y crear ImageIcons usados en las vistas.
+ * Centraliza rutas, redimensionado y creación de iconos por texto como respaldo.
+ */
 public class ImagenUtil {
     
     private static final String RUTA_IMAGENES = "../Files/src/dqs/utilidades/";
     
     // Mapeo de tipos de heroes con sus imagenes
+    /** Devuelve un ImageIcon representando el héroe según su tipo. */
     public static ImageIcon obtenerImagenHeroe(String tipoHeroe) {
         String nombreArchivo = switch (tipoHeroe.toUpperCase()) {
             case "MAGO" -> "Un mago de videojueg.png";
@@ -28,6 +33,7 @@ public class ImagenUtil {
     }
     
     // Metodo para obtener imagenes de enemigos
+    /** Devuelve un ImageIcon del enemigo según su tipo. */
     public static ImageIcon obtenerImagenEnemigo(String tipoEnemigo) {
         String nombreArchivo = "";
         
@@ -55,6 +61,7 @@ public class ImagenUtil {
     }
     
     // Obtener imagen de enemigo más pequeña para botones
+    /** Devuelve un ImageIcon de tamaño reducido para botones (enemigos). */
     public static ImageIcon obtenerImagenEnemigoBoton(String tipoEnemigo) {
         String nombreArchivo = "";
         
@@ -82,6 +89,7 @@ public class ImagenUtil {
     }
     
     // Obtener imagen más pequeña para botones
+    /** Devuelve un ImageIcon de tamaño reducido para botones (héroes). */
     public static ImageIcon obtenerImagenHeroeBoton(String tipoHeroe) {
         String nombreArchivo = switch (tipoHeroe.toUpperCase()) {
             case "MAGO" -> "Un mago de videojueg.png";
@@ -99,6 +107,7 @@ public class ImagenUtil {
     }
     
     // Metodo principal para cargar y redimensionar imagenes
+    /** Carga una imagen desde disco y la redimensiona, devolviendo un ImageIcon. */
     public static ImageIcon cargarImagenRedimensionada(String nombreArchivo, int ancho, int alto) {
         try {
             BufferedImage imagenOriginal = ImageIO.read(new File(RUTA_IMAGENES + nombreArchivo));
@@ -111,6 +120,7 @@ public class ImagenUtil {
     }
     
     // Crear icono de texto como respaldo
+    /** Crea un ImageIcon simple con texto como respaldo cuando falta la imagen. */
     public static ImageIcon crearIconoTexto(String texto) {
         BufferedImage imagen = new BufferedImage(64, 64, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = imagen.createGraphics();
@@ -136,6 +146,7 @@ public class ImagenUtil {
     }
     
     // Iconos especiales para botones del menu
+    /** Crea iconos vectoriales pequeños para botones del menú (dibujos simples). */
     public static ImageIcon crearIconoBoton(String tipo, Color color) {
         BufferedImage imagen = new BufferedImage(24, 24, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = imagen.createGraphics();

@@ -1,4 +1,4 @@
-package dqs.modelo;
+package dqs.modelos;
 
 public abstract class Personaje {
     protected String nombre;

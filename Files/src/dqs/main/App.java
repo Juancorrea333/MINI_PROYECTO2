@@ -3,7 +3,7 @@ package dqs.main;
 import java.util.Scanner;
 
 
-import dqs.modelo.*;
+import dqs.modelos.*;
 
 /**
  * Punto de entrada y capa de interacción (CLI) del juego.

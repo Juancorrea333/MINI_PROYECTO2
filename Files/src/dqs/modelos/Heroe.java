@@ -1,4 +1,4 @@
-package dqs.modelo;
+package dqs.modelos;
 
 import java.util.Scanner;
 
@@ -80,10 +80,10 @@ public class Heroe extends Personaje implements Sanador, Tanque, Hechicero {
 
     public void mostrarEstado() {
         System.out.println("\n " + nombre + " [" + tipo.name() + "]");
-        System.out.println("HP: " + hp + " | MP: " + mp +
-                           " | Ataque: " + ataque + " | Defensa: " + defensa +
+        System.out.println("HP: " + hp + "\n"+ " MP: " + mp + "\n" +
+                           " | Ataque: " + ataque +"\n" + " | Defensa: " + defensa + "\n" +
                            " | Velocidad: " + velocidad);
-        System.out.println("Descripción: " + tipo.getDescripcion());
+        System.out.println("\n" + "Descripción: " + tipo.getDescripcion());
         System.out.println("--------------------------------------");
     }
 
@@ -112,6 +112,7 @@ public class Heroe extends Personaje implements Sanador, Tanque, Hechicero {
         }
     }
 
+    // Método para defender a un aliado
     @Override
     public void defender(Personaje aliado) {
         if (tipo == Tipo_Heroe.GUERRERO || tipo == Tipo_Heroe.PALADIN) {

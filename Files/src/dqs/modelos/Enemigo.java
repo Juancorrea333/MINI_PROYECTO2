@@ -1,4 +1,4 @@
-package dqs.modelo;
+package dqs.modelos;
 
 public class Enemigo extends Personaje implements Agresivo, Jefe {
 	private final Tipo_Enemigo tipo;

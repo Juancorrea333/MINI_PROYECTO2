@@ -9,9 +9,10 @@ public abstract class Personaje {
     protected int velocidad;
     protected boolean esta_vivo = true;
     protected boolean esta_paralizado = false;
+    // Replaced boolean flags by counters so we can track duration of effects
+    protected int turnosParalisis = 0; // turnos restantes de parálisis
     protected boolean siendo_defendido = false;
-    protected boolean esta_durmiendo = false;
-    protected boolean serparalizado = false;
+    protected int turnosSueno = 0; // turnos restantes de sueño
     protected boolean esta_provocado = false;
     protected Personaje provocador = null;
     protected Personaje defensor = null;
@@ -79,15 +80,42 @@ public abstract class Personaje {
     }
 
     // Métodos para manejar el estado de sueño
-    public void dormir() {
-        this.esta_durmiendo = true;
-        System.out.println(this.nombre + " ha caído dormido!");
+    /**
+     * Aplica sueño durante 'turnos' turnos. Durante ese tiempo el personaje
+     * no podrá actuar. Se registra la duración en `turnosSueno`.
+     */
+    public void aplicarSueno(int turnos) {
+        if (turnos <= 0) return;
+        this.turnosSueno = Math.max(this.turnosSueno, turnos);
+        System.out.println(this.nombre + " ha caído dormido por " + turnos + " turnos!");
     }
 
-    //Metodo de paralisis
-    public void serParalizado() {
-        this.esta_paralizado = true;
-        System.out.println(this.nombre + " ha sido paralizado!");
+    /**
+     * Aplica parálisis durante 'turnos' turnos. Durante ese tiempo el personaje
+     * no podrá actuar. Se registra la duración en `turnosParalisis`.
+     */
+    public void aplicarParalisis(int turnos) {
+        if (turnos <= 0) return;
+        this.turnosParalisis = Math.max(this.turnosParalisis, turnos);
+        System.out.println(this.nombre + " ha sido paralizado por " + turnos + " turno(s)!");
+    }
+
+    /**
+     * Comprueba si el personaje puede actuar en este turno. Si tiene efectos
+     * activos, decrementa sus contadores y devuelve false.
+     */
+    public boolean puedeActuar() {
+        if (this.turnosParalisis > 0) {
+            this.turnosParalisis--;
+            System.out.println(this.nombre + " está paralizado y pierde el turno. Turnos de parálisis restantes: " + this.turnosParalisis);
+            return false;
+        }
+        if (this.turnosSueno > 0) {
+            this.turnosSueno--;
+            System.out.println(this.nombre + " está dormido y pierde el turno. Turnos de sueño restantes: " + this.turnosSueno);
+            return false;
+        }
+        return true;
     }
 
     // Métodos para manejar la defensa por tanque

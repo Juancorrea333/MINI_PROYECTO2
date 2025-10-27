@@ -127,15 +127,17 @@ public class App {
         System.out.println("2. Crear equipo de enemigos (completo)");
         System.out.println("3. Crear héroe en una posición (interactivo)");
         System.out.println("4. Crear enemigo en una posición (interactivo)");
-        System.out.println("5. Volver");
+        System.out.println("5. Crear equipo de héroes por defecto (para pruebas)");
+    System.out.println("6. Volver");
         System.out.print("Seleccione: ");
-
         int op = leerEntero();
         switch (op) {
             case 1 -> batalla.crearEquipoHeroes();
             case 2 -> batalla.crearEquipoEnemigos();
             case 3 -> batalla.crearHeroeInteractivo(scanner);
             case 4 -> batalla.crearEnemigoInteractivo(scanner);
+            case 5 -> batalla.crearEquipoHeroesPorDefecto();
+            case 6 -> System.out.println("Volviendo al menú principal.");
             default -> System.out.println("Volviendo al menú principal.");
         }
     }

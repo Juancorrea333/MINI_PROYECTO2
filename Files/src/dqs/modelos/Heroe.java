@@ -263,14 +263,12 @@ public class Heroe extends Personaje implements Sanador, Tanque, Hechicero {
 
     @Override
     public void LanzaHechizoSueño(Personaje objetivo) {
+        // Ahora el hechizo de sueño aplica el estado de sueño por 3 turnos
         if (tipo == Tipo_Heroe.MAGO || tipo == Tipo_Heroe.DRUIDA) {
             int costoMana = 20;
             if (mp >= costoMana) {
                 mp -= costoMana;
-                int dañoHechizo = 40;
-                objetivo.recibir_daño(dañoHechizo);
-                System.out.println(nombre + " lanza el hechizo Sueño a " + objetivo.getNombre() +
-                                 " causando " + dañoHechizo + " puntos de daño.");
+                objetivo.aplicarSueno(3); // dormir 3 turnos
             } else {
                 System.out.println(nombre + " no tiene suficiente MP para lanzar el hechizo.");
             }
@@ -300,13 +298,12 @@ public class Heroe extends Personaje implements Sanador, Tanque, Hechicero {
     //Metodo para paralizar a un enemigo
     @Override
     public void LanzaHechizoParalisis(Personaje objetivo) {
+        // La parálisis ahora aplica 1 turno de incapacidad mediante aplicarParalisis
         if (tipo == Tipo_Heroe.MAGO || tipo == Tipo_Heroe.DRUIDA) {
             int costoMana = 25;
             if (mp >= costoMana) {
                 mp -= costoMana;
-                System.out.println(nombre + " lanza el hechizo Parálisis a " + objetivo.getNombre() +
-                                 ", paralizándolo por un turno.");
-                objetivo.serParalizado();
+                objetivo.aplicarParalisis(1);
             } else {
                 System.out.println(nombre + " no tiene suficiente MP para lanzar el hechizo.");
             }

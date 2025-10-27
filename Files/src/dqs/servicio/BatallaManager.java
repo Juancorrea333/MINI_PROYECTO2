@@ -66,7 +66,19 @@ public class BatallaManager {
                     Enemigo eFinal = enemigo; // para usar dentro de la lambda
                     scheduler.schedule(() -> {
                         System.out.println("\n" + eFinal.getNombre() + " está actuando...");
-                        eFinal.atacarConProvocacion(convertirHeroesAPersonajes(batalla.getEquipoHeroes()));
+
+                        // Si el enemigo es un jefe con comportamiento especial, delegar en su actuar
+                        try {
+                            if (eFinal instanceof dqs.modelos.JefeEnemigo) {
+                                // JefeEnemigo.actuar maneja cooldowns y usa la habilidad especial cada N turnos
+                                ((dqs.modelos.JefeEnemigo)eFinal).actuar(batalla.getEquipoHeroes());
+                            } else {
+                                // Enemigos normales atacan a un héroe vivo aleatorio
+                                eFinal.atacarAleatorio(batalla.getEquipoHeroes());
+                            }
+                        } catch (Exception ex) {
+                            System.out.println("Error al ejecutar acción del enemigo: " + ex.getMessage());
+                        }
                     }, delayMs, TimeUnit.MILLISECONDS);
                     delayMs += stepMs;
                 }
@@ -178,8 +190,8 @@ public class BatallaManager {
             }
 
             if (heroe.getTipo() == Tipo_Heroe.MAGO){
-                System.out.println("9. Lanzar Hechizo de refuerzo");
-                System.out.println("10. Lanzar Hechizo de parálisis");
+                System.out.println("10. Lanzar Hechizo de refuerzo");
+                System.out.println("11. Lanzar Hechizo de parálisis");
             }
 
             System.out.println("12. Pasar Turno");

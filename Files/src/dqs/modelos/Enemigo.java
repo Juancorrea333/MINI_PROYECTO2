@@ -17,6 +17,26 @@ public class Enemigo extends Personaje implements Agresivo, Jefe {
         }
 	}
 
+    /**
+     * Constructor alternativo que permite omitir la validación de atributos.
+     * Útil para crear jefes con rangos propios definidos en Tipo_JefeEnemigo.
+     */
+    public Enemigo(String nombre, int hp, int mp, int ataque, int defensa, int velocidad, Tipo_Enemigo tipo, boolean skipValidation) {
+        super(nombre, hp, mp, ataque, defensa, velocidad);
+        this.tipo = tipo;
+        if (!skipValidation) {
+            if(!tipo.validarAtributos(hp, mp, ataque, defensa)) {
+                throw new IllegalArgumentException(
+                    "Atributos fuera del rango permitido para el tipo " + tipo.name() +
+                    "\nHP: " + tipo.getMinHp() + " - " + tipo.getMaxHp() +
+                    " |MP: " + tipo.getMinMp() + " - " + tipo.getMaxMp() +
+                    " |Ataque: " + tipo.getMinAtaque() + " - " + tipo.getMaxAtaque() +
+                    " |Defensa: " + tipo.getMinDefensa() + " - " + tipo.getMaxDefensa()
+                );
+            }
+        }
+    }
+
      public void mostrarEstado() {
         System.out.println("\n " + nombre + " [" + tipo.name() + "]");
         System.out.println("HP: " + hp + " | MP: " + mp +
@@ -88,6 +108,9 @@ public class Enemigo extends Personaje implements Agresivo, Jefe {
 
     // Permite al enemigo elegir y atacar a un héroe vivo del array proporcionado
     public void atacarAleatorio(Heroe[] heroes) {
+        // Respetar estados (parálisis/sueño)
+        if (!this.puedeActuar()) return;
+
         if (heroes == null || heroes.length == 0) {
             System.out.println(this.nombre + " no tiene héroes a los que atacar.");
             return;

@@ -47,8 +47,10 @@ public class Batalla {
     public void crearYAgregarEnemigo(int posicion) {
         if (posicion >= 0 && posicion < equipoEnemigos.length) {
             System.out.println("\n=== Creando enemigo para la posición " + (posicion + 1) + " ===");
-            // Usar el primer tipo disponible como valor por defecto y un nombre generado automáticamente.
-            equipoEnemigos[posicion] = Enemigo.crearEnemigo(Tipo_Enemigo.values()[0], "Enemigo " + (posicion + 1));
+            // Selección aleatoria de tipo de enemigo para evitar siempre el primer tipo
+            Tipo_Enemigo[] tipos = Tipo_Enemigo.values();
+            Tipo_Enemigo elegido = tipos[(int)(Math.random() * tipos.length)];
+            equipoEnemigos[posicion] = Enemigo.crearEnemigo(elegido, "Enemigo " + (posicion + 1));
             System.out.println("¡Enemigo agregado exitosamente!");
         } else {
             throw new IllegalArgumentException("Posición inválida para el equipo de enemigos.");
@@ -139,10 +141,33 @@ public class Batalla {
     // Método para crear todo el equipo de enemigos
     public void crearEquipoEnemigos() {
         System.out.println("\n=== CREACIÓN DEL EQUIPO DE ENEMIGOS ===");
+        // Primero crear enemigos normales aleatorios
         for (int i = 0; i < equipoEnemigos.length; i++) {
             crearYAgregarEnemigo(i);
         }
-        System.out.println("\n¡Equipo de enemigos completo!");
+
+        // Insertar un jefe en una posición aleatoria del arreglo de enemigos
+        int posicionJefe = (int)(Math.random() * equipoEnemigos.length);
+        Tipo_JefeEnemigo[] tiposJefes = Tipo_JefeEnemigo.values();
+        Tipo_JefeEnemigo jefeElegido = tiposJefes[(int)(Math.random() * tiposJefes.length)];
+        // Crear jefe con la fábrica y sobrescribir la posición
+        JefeEnemigo jefe = JefeFactory.crearJefe(jefeElegido, "Jefe " + (posicionJefe + 1));
+        equipoEnemigos[posicionJefe] = jefe;
+
+        System.out.println("\n¡Equipo de enemigos completo! (incluye jefe en la posición " + (posicionJefe + 1) + ")");
+    }
+
+    /**
+     * Crea un equipo de héroes por defecto (útil para pruebas rápidas).
+     * Llena las 4 posiciones con héroes de tipos y atributos por defecto.
+     */
+    public void crearEquipoHeroesPorDefecto() {
+        System.out.println("\n=== CREANDO EQUIPO DE HÉROES POR DEFECTO PARA PRUEBAS ===");
+        equipoHeroes[0] = new Heroe("Aldor", Tipo_Heroe.GUERRERO, 220, 20, 100, 25, 20);
+        equipoHeroes[1] = new Heroe("Merina", Tipo_Heroe.MAGO, 90, 200, 35, 80, 18);
+        equipoHeroes[2] = new Heroe("Tharok", Tipo_Heroe.PALADIN, 160, 80, 120, 30, 16);
+        equipoHeroes[3] = new Heroe("Lyra", Tipo_Heroe.DRUIDA, 120, 140, 30, 70, 22);
+        System.out.println("Equipo de héroes por defecto creado.");
     }
 
     // Método para mostrar los equipos

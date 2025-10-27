@@ -1,479 +1,657 @@
 package dqs.vista;
 
+import dqs.modelos.*;
+
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.util.concurrent.ExecutionException;
+import javax.swing.border.LineBorder;
 
 /**
- * Interfaz para gestionar batallas reales usando equipos cargados.
- * Muestra el estado de los héroes/enemigos, un log de batalla y controles
- * para cargar equipos e iniciar la simulación gestionada por BatallaManager.
+ * Vista única que inicia una batalla con héroes por defecto y enemigos aleatorios.
+ * El jugador controla las acciones de los héroes desde la interfaz. Después de
+ * que todos los héroes actúen, los enemigos realizan su turno automáticamente.
  */
 public class VistaIniciarBatallaNueva extends JFrame {
-    private String[] equipoHeroes;
-    private String[] equipoEnemigos;
-    private BatallaManager batallaManager;
+    private Batalla batalla;
     private JPanel panelEstado;
     private JTextArea areaLog;
-    private JButton btnIniciarBatalla;
-    private JButton btnCargarEquipos;
     private JButton btnVolverMenu;
-    
-    /** Constructor: prepara la UI y arrays de equipos. */
+    private JPanel panelAcciones;
+
+    // Visuales por personaje
+    private JPanel[] panelHeroesUI;
+    private JLabel[] lblHeroeNombre;
+    private JProgressBar[] barraHpHeroes;
+
+    private JPanel[] panelEnemigosUI;
+    private JLabel[] lblEnemigoNombre;
+    private JProgressBar[] barraHpEnemigos;
+
+    // Turnos
+    private int indiceHeroeActual = 0; // índice del héroe que debe actuar
+
+    // Modo de selección de objetivo
+    private enum TargetMode { NONE, SELECT_ENEMY, SELECT_ALLY, SELECT_REVIVE }
+    private TargetMode targetMode = TargetMode.NONE;
+    private Heroe heroeActuando = null;
+    private ActionSeleccionada accionSeleccionada = ActionSeleccionada.NONE;
+
+    private enum ActionSeleccionada {
+        NONE, ATTACK, DEFEND, PROVOKE, INCREASE_DEF, HEAL, RESTORE_MP, REMOVE_EFFECT, REVIVE, SLEEP, REINFORCE, PARALYZE, PASS
+    }
+
     public VistaIniciarBatallaNueva() {
-        inicializarComponentes();
-        equipoHeroes = new String[4];
-        equipoEnemigos = new String[3];
-    }
-    
-    /** Construye los paneles, log y botones de la vista. */
-    private void inicializarComponentes() {
-        setTitle("Dragon Quest VIII - Batalla Real");
+        setTitle("Dragon Quest VIII - Batalla");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        setExtendedState(JFrame.MAXIMIZED_BOTH);
-        setLayout(new BorderLayout());
-        
-        // Configurar fondo
-        getContentPane().setBackground(new Color(20, 20, 30));
-        
-        // Panel superior - Estado de la batalla
-        panelEstado = new JPanel(new GridLayout(2, 5, 10, 5));
-        panelEstado.setBackground(new Color(30, 30, 40));
-        panelEstado.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.CYAN, 2),
-            "Estado de la Batalla",
-            0, 0, new Font("Arial", Font.BOLD, 14), Color.CYAN));
-        
-        inicializarPanelEstado();
-        
-        add(panelEstado, BorderLayout.NORTH);
-        
-        // Panel central - Log de batalla
-        areaLog = new JTextArea();
-        areaLog.setFont(new Font("Consolas", Font.PLAIN, 12));
-        areaLog.setBackground(new Color(15, 15, 25));
-        areaLog.setForeground(Color.WHITE);
-        areaLog.setEditable(false);
-        areaLog.setText("=== SISTEMA DE BATALLA REAL ===\n" +
-                        "1. Primero carga equipos de héroes y enemigos\n" +
-                        "2. Haz clic en 'Iniciar Batalla' para comenzar\n" +
-                        "3. Selecciona acciones para cada héroe en su turno\n" +
-                        "4. Los enemigos actuarán automáticamente\n\n" +
-                        "Tipos de Héroes disponibles:\n" +
-                        "- MAGO: Alto MP, hechizos poderosos\n" +
-                        "- DRUIDA: Curación y magia de la naturaleza\n" +
-                        "- GUERRERO: Alto HP, ataques físicos fuertes\n" +
-                        "- PALADIN: Equilibrado, puede curar y atacar\n\n" +
-                        "¡Prepárate para la batalla!\n\n");
-        
-        JScrollPane scrollPane = new JScrollPane(areaLog);
-        scrollPane.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.GREEN, 2),
-            "Log de Batalla",
-            0, 0, new Font("Arial", Font.BOLD, 14), Color.GREEN));
-        
-        add(scrollPane, BorderLayout.CENTER);
-        
-        // Panel inferior - Controles
-        JPanel panelControles = crearPanelControles();
-        add(panelControles, BorderLayout.SOUTH);
-        
-        // Inicializar BatallaManager
-        batallaManager = new BatallaManager(this, panelEstado, areaLog);
-        
-        setVisible(true);
-    }
-    
-    /** Inicializa los paneles de estado (placeholders para imágenes y texto). */
-    private void inicializarPanelEstado() {
-        // Primera fila - Héroes
-        for (int i = 0; i < 5; i++) {
-            JPanel panelHeroe = new JPanel(new BorderLayout());
-            panelHeroe.setBackground(new Color(40, 40, 50));
-            panelHeroe.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
-            panelHeroe.setPreferredSize(new Dimension(120, 80));
-            
-            // Imagen del héroe (placeholder inicialmente)
-            JLabel lblImagenHeroe = new JLabel("", SwingConstants.CENTER);
-            lblImagenHeroe.setPreferredSize(new Dimension(60, 60));
-            
-            // Texto del héroe
-            JLabel lblTextoHeroe = new JLabel("Héroe " + (i + 1) + ": [Vacío]", SwingConstants.CENTER);
-            lblTextoHeroe.setFont(new Font("Arial", Font.BOLD, 10));
-            lblTextoHeroe.setForeground(Color.LIGHT_GRAY);
-            
-            panelHeroe.add(lblImagenHeroe, BorderLayout.CENTER);
-            panelHeroe.add(lblTextoHeroe, BorderLayout.SOUTH);
-            panelEstado.add(panelHeroe);
-        }
-        
-        // Segunda fila - Enemigos
-        for (int i = 0; i < 5; i++) {
-            JPanel panelEnemigo = new JPanel(new BorderLayout());
-            panelEnemigo.setBackground(new Color(40, 40, 50));
-            panelEnemigo.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-            panelEnemigo.setPreferredSize(new Dimension(120, 80));
-            
-            // Imagen del enemigo (placeholder inicialmente)
-            JLabel lblImagenEnemigo = new JLabel("", SwingConstants.CENTER);
-            lblImagenEnemigo.setPreferredSize(new Dimension(60, 60));
-            
-            // Texto del enemigo
-            JLabel lblTextoEnemigo = new JLabel("Enemigo " + (i + 1) + ": [Vacío]", SwingConstants.CENTER);
-            lblTextoEnemigo.setFont(new Font("Arial", Font.BOLD, 10));
-            lblTextoEnemigo.setForeground(Color.LIGHT_GRAY);
-            
-            panelEnemigo.add(lblImagenEnemigo, BorderLayout.CENTER);
-            panelEnemigo.add(lblTextoEnemigo, BorderLayout.SOUTH);
-            panelEstado.add(panelEnemigo);
-        }
-    }
-    
-    /** Crea y devuelve el panel de controles (cargar, iniciar, volver). */
-    private JPanel crearPanelControles() {
-        JPanel panel = new JPanel(new FlowLayout());
-        panel.setBackground(new Color(20, 20, 30));
-        
-        btnCargarEquipos = new JButton("Cargar Equipos");
-        btnCargarEquipos.setFont(new Font("Arial", Font.BOLD, 14));
-        btnCargarEquipos.setBackground(new Color(0, 120, 215));
-        btnCargarEquipos.setForeground(Color.WHITE);
-        btnCargarEquipos.setFocusPainted(false);
-        btnCargarEquipos.addActionListener(e -> cargarEquipos());
-        
-        btnIniciarBatalla = new JButton("Iniciar Batalla");
-        btnIniciarBatalla.setFont(new Font("Arial", Font.BOLD, 14));
-        btnIniciarBatalla.setBackground(new Color(0, 150, 0));
-        btnIniciarBatalla.setForeground(Color.WHITE);
-        btnIniciarBatalla.setFocusPainted(false);
-        btnIniciarBatalla.setEnabled(false);
-        btnIniciarBatalla.addActionListener(e -> iniciarBatalla());
-        
-        btnVolverMenu = new JButton("Volver al Menú");
-        btnVolverMenu.setFont(new Font("Arial", Font.BOLD, 14));
-        btnVolverMenu.setBackground(new Color(150, 0, 0));
-        btnVolverMenu.setForeground(Color.WHITE);
-        btnVolverMenu.setFocusPainted(false);
-        btnVolverMenu.addActionListener(e -> volverAlMenu());
-        
-        panel.add(btnCargarEquipos);
-        panel.add(btnIniciarBatalla);
-        panel.add(btnVolverMenu);
-        
-        return panel;
-    }
-    
-    /** Abre un diálogo para pegar/listar los equipos de héroes y enemigos. */
-    private void cargarEquipos() {
-        // Crear diálogo para cargar equipos
-        JDialog dialog = new JDialog(this, "Cargar Equipos", true);
-        dialog.setLayout(new BorderLayout());
-        dialog.setSize(600, 500);
-        dialog.setLocationRelativeTo(this);
-        
-        JPanel panelPrincipal = new JPanel(new GridLayout(2, 1, 10, 10));
-        panelPrincipal.setBackground(new Color(30, 30, 40));
-        panelPrincipal.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        
-        // Panel de héroes
-        JPanel panelHeroes = new JPanel(new BorderLayout());
-        panelHeroes.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.BLUE, 2),
-            "Equipo de Héroes",
-            0, 0, new Font("Arial", Font.BOLD, 14), Color.BLUE));
-        panelHeroes.setBackground(new Color(30, 30, 40));
-        
-        JTextArea areaHeroes = new JTextArea(8, 40);
-        areaHeroes.setFont(new Font("Arial", Font.PLAIN, 12));
-        areaHeroes.setBackground(new Color(40, 40, 50));
-        areaHeroes.setForeground(Color.WHITE);
-        areaHeroes.setText("Introduce los héroes (uno por línea):\n" +
-                          "Aragorn (GUERRERO)\n" +
-                          "Gandalf (MAGO)\n" +
-                          "Legolas (DRUIDA)\n" +
-                          "Gimli (PALADIN)");
-        
-        panelHeroes.add(new JScrollPane(areaHeroes), BorderLayout.CENTER);
-        
-        // Panel de enemigos
-        JPanel panelEnemigos = new JPanel(new BorderLayout());
-        panelEnemigos.setBorder(BorderFactory.createTitledBorder(
-            BorderFactory.createLineBorder(Color.RED, 2),
-            "Equipo de Enemigos",
-            0, 0, new Font("Arial", Font.BOLD, 14), Color.RED));
-        panelEnemigos.setBackground(new Color(30, 30, 40));
-        
-        JTextArea areaEnemigos = new JTextArea(8, 40);
-        areaEnemigos.setFont(new Font("Arial", Font.PLAIN, 12));
-        areaEnemigos.setBackground(new Color(40, 40, 50));
-        areaEnemigos.setForeground(Color.WHITE);
-        areaEnemigos.setText("Introduce los enemigos (uno por línea):\n" +
-                            "Orco Salvaje (ORCO)\n" +
-                            "Troll Gigante (TROLL)\n" +
-                            "Dragon Rojo (DRAGON)");
-        
-        panelEnemigos.add(new JScrollPane(areaEnemigos), BorderLayout.CENTER);
-        
-        panelPrincipal.add(panelHeroes);
-        panelPrincipal.add(panelEnemigos);
-        
-        // Botones
-        JPanel panelBotones = new JPanel(new FlowLayout());
-        panelBotones.setBackground(new Color(30, 30, 40));
-        
-        JButton btnCargar = new JButton("Cargar Equipos");
-        btnCargar.setBackground(new Color(0, 150, 0));
-        btnCargar.setForeground(Color.WHITE);
-        btnCargar.addActionListener(ev -> {
-            String[] lineasHeroes = areaHeroes.getText().split("\n");
-            String[] lineasEnemigos = areaEnemigos.getText().split("\n");
-            
-            // Limpiar equipos
-            equipoHeroes = new String[5];
-            equipoEnemigos = new String[5];
-            
-            // Procesar héroes
-            int indexHeroe = 0;
-            for (String linea : lineasHeroes) {
-                linea = linea.trim();
-                if (!linea.isEmpty() && !linea.startsWith("Introduce") && indexHeroe < 5) {
-                    if (linea.contains("(") && linea.contains(")")) {
-                        equipoHeroes[indexHeroe] = linea;
-                        indexHeroe++;
+        setSize(1100, 700);
+
+                // Inicializar componentes visuales
+                panelEstado = new JPanel(new GridLayout(2, 4, 10, 10));
+                panelEstado.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+                areaLog = new JTextArea();
+                areaLog.setEditable(false);
+                areaLog.setFont(new Font("Consolas", Font.PLAIN, 12));
+                areaLog.setBackground(new Color(12, 12, 18));
+                areaLog.setForeground(Color.WHITE);
+
+                JScrollPane scroll = new JScrollPane(areaLog);
+                scroll.setPreferredSize(new Dimension(400, 200));
+
+                btnVolverMenu = new JButton("Salir");
+                btnVolverMenu.addActionListener(e -> dispose());
+
+                JPanel bottom = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+                bottom.add(btnVolverMenu);
+
+                add(panelEstado, BorderLayout.CENTER);
+                add(scroll, BorderLayout.EAST);
+                add(bottom, BorderLayout.SOUTH);
+
+                // Crear batalla y equipos
+                this.batalla = new Batalla();
+                try {
+                    this.batalla.crearEquipoHeroesPorDefecto();
+                } catch (RuntimeException ex) {
+                    // Si la creación por defecto falla (por validaciones en modelo),
+                    // registrar el error en el log y continuar con equipos vacíos para
+                    // permitir que la UI se inicie sin bloquear la aplicación.
+                    appendLog("Advertencia: no se pudieron crear héroes por defecto: " + ex.getMessage());
+                }
+
+                try {
+                    this.batalla.crearEquipoEnemigos();
+                } catch (RuntimeException ex) {
+                    appendLog("Advertencia: no se pudieron crear enemigos por defecto: " + ex.getMessage());
+                }
+
+                // Inicializar arrays UI acorde a tamaños del modelo
+                Heroe[] heroes = batalla.getEquipoHeroes();
+                Enemigo[] enemigos = batalla.getEquipoEnemigos();
+
+                panelHeroesUI = new JPanel[heroes.length];
+                lblHeroeNombre = new JLabel[heroes.length];
+                barraHpHeroes = new JProgressBar[heroes.length];
+
+                panelEnemigosUI = new JPanel[enemigos.length];
+                lblEnemigoNombre = new JLabel[enemigos.length];
+                barraHpEnemigos = new JProgressBar[enemigos.length];
+
+                // Construir UI de héroes
+                for (int i = 0; i < heroes.length; i++) {
+                    JPanel p = crearPanelPersonaje(true, i);
+                    panelHeroesUI[i] = p;
+                    panelEstado.add(p);
+                }
+
+                // Construir UI de enemigos
+                for (int i = 0; i < enemigos.length; i++) {
+                    JPanel p = crearPanelPersonaje(false, i);
+                    panelEnemigosUI[i] = p;
+                    panelEstado.add(p);
+                }
+
+                // Panel derecho inferior de acciones
+                this.panelAcciones = crearPanelAcciones();
+                add(this.panelAcciones, BorderLayout.NORTH);
+
+                refreshUI();
+
+                // Empezar turno en el primer héroe vivo
+                indiceHeroeActual = buscarSiguienteHeroeVivo(0);
+                if (indiceHeroeActual >= 0) {
+                    iniciarTurnoHeroe(indiceHeroeActual);
+                }
+
+                setVisible(true);
+            }
+
+            /**
+             * Crea y devuelve un JPanel que representa a un personaje (héroe o enemigo).
+             *
+             * Comportamiento:
+             * - Construye un panel con un icono centrado, una etiqueta de nombre arriba y
+             *   una barra de vida en la parte inferior.
+             * - Registra un MouseListener que actúa como selector de objetivo según el
+             *   modo de selección actual: seleccionar aliado, seleccionar enemigo o
+             *   revivir. Cuando se detecta un clic y el modo coincide, se delega en los
+             *   métodos aplicarAccionSobreAliado/aplicarAccionSobreEnemigo.
+             *
+             * Efectos secundarios:
+             * - Modifica los arreglos `lblHeroeNombre`/`lblEnemigoNombre` y
+             *   `barraHpHeroes`/`barraHpEnemigos` para mantener referencias a los
+             *   componentes creados.
+             *
+             * Parámetros:
+             * - esHeroe: true si el panel corresponde a un héroe, false para enemigo.
+             * - idx: índice dentro del arreglo correspondiente (se usa para localizar
+             *   el objeto modelo en `batalla`).
+             *
+             * Retorna:
+             * - JPanel configurado listo para añadirse a la interfaz.
+             */
+            private JPanel crearPanelPersonaje(boolean esHeroe, int idx) {
+                JPanel panel = new JPanel(new BorderLayout());
+                panel.setPreferredSize(new Dimension(200, 120));
+                panel.setBackground(new Color(28, 28, 36));
+                panel.setBorder(new LineBorder(esHeroe ? Color.CYAN : Color.RED, 2));
+
+                JLabel lblNombre = new JLabel("", SwingConstants.CENTER);
+                lblNombre.setForeground(Color.WHITE);
+                lblNombre.setFont(new Font("Arial", Font.BOLD, 12));
+
+                JProgressBar barra = new JProgressBar();
+                barra.setStringPainted(true);
+
+                JLabel lblIcon = new JLabel();
+                lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
+
+                panel.add(lblIcon, BorderLayout.CENTER);
+                panel.add(lblNombre, BorderLayout.NORTH);
+                panel.add(barra, BorderLayout.SOUTH);
+
+                if (esHeroe) {
+                    lblHeroeNombre[idx] = lblNombre;
+                    barraHpHeroes[idx] = barra;
+                    panel.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            // Si estamos en modo elegir aliado (curar/defensa/revive)
+                            if (targetMode == TargetMode.SELECT_ALLY && heroeActuando != null) {
+                                Heroe aliado = batalla.getEquipoHeroes()[idx];
+                                if (aliado != null) aplicarAccionSobreAliado(aliado);
+                            } else if (targetMode == TargetMode.SELECT_REVIVE && heroeActuando != null) {
+                                Heroe candidato = batalla.getEquipoHeroes()[idx];
+                                if (candidato != null && !candidato.esta_vivo()) aplicarAccionSobreAliado(candidato);
+                            }
+                        }
+                    });
+                } else {
+                    lblEnemigoNombre[idx] = lblNombre;
+                    barraHpEnemigos[idx] = barra;
+                    panel.addMouseListener(new MouseAdapter() {
+                        @Override
+                        public void mouseClicked(MouseEvent e) {
+                            if (targetMode == TargetMode.SELECT_ENEMY && heroeActuando != null) {
+                                Enemigo objetivo = batalla.getEquipoEnemigos()[idx];
+                                if (objetivo != null && objetivo.esta_vivo()) aplicarAccionSobreEnemigo(objetivo);
+                            }
+                        }
+                    });
+                }
+
+                return panel;
+            }
+
+            /**
+             * Construye el panel de acciones con todos los botones disponibles para
+             * los héroes. Los botones activan modos de selección o ejecutan acciones
+             * inmediatas y se almacenan como propiedades del panel para poder
+             * habilitarlos/deshabilitarlos dinámicamente.
+             *
+             * Retorna:
+             * - JPanel con la botonera totalmente configurada.
+             */
+            private JPanel crearPanelAcciones() {
+                JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                panel.setBackground(new Color(20, 20, 30));
+
+                JButton btnAtacar = new JButton("Atacar");
+                JButton btnDefender = new JButton("Defender");
+                JButton btnProvocar = new JButton("Provocar");
+                JButton btnAumDef = new JButton("Aumentar Def");
+                JButton btnCurar = new JButton("Curar");
+                JButton btnRestaurar = new JButton("Restaurar MP");
+                JButton btnEliminarEfecto = new JButton("Eliminar Efecto");
+                JButton btnRevivir = new JButton("Revivir");
+                JButton btnSueno = new JButton("Hechizo Sueño");
+                JButton btnRefuerzo = new JButton("Refuerzo");
+                JButton btnParalisis = new JButton("Parálisis");
+                JButton btnPasar = new JButton("Pasar Turno");
+
+                panel.add(btnAtacar);
+                panel.add(btnDefender);
+                panel.add(btnProvocar);
+                panel.add(btnAumDef);
+                panel.add(btnCurar);
+                panel.add(btnRestaurar);
+                panel.add(btnEliminarEfecto);
+                panel.add(btnRevivir);
+                panel.add(btnSueno);
+                panel.add(btnRefuerzo);
+                panel.add(btnParalisis);
+                panel.add(btnPasar);
+
+                btnAtacar.addActionListener(e -> pedirSeleccionEnemigo(ActionSeleccionada.ATTACK));
+                btnDefender.addActionListener(e -> pedirSeleccionAliado(ActionSeleccionada.DEFEND));
+                btnProvocar.addActionListener(e -> pedirSeleccionEnemigo(ActionSeleccionada.PROVOKE));
+                btnAumDef.addActionListener(e -> {
+                    if (heroeActuando != null) {
+                        heroeActuando.aumentarDefensa(10);
+                        appendLog(heroeActuando.getNombre() + " aumenta su defensa en 10.");
+                        terminarTurnoHeroe();
+                    }
+                });
+                btnCurar.addActionListener(e -> pedirSeleccionAliado(ActionSeleccionada.HEAL));
+                btnRestaurar.addActionListener(e -> pedirSeleccionAliado(ActionSeleccionada.RESTORE_MP));
+                btnEliminarEfecto.addActionListener(e -> pedirSeleccionAliado(ActionSeleccionada.REMOVE_EFFECT));
+                btnRevivir.addActionListener(e -> pedirSeleccionAliado(ActionSeleccionada.REVIVE));
+                btnSueno.addActionListener(e -> pedirSeleccionEnemigo(ActionSeleccionada.SLEEP));
+                btnRefuerzo.addActionListener(e -> pedirSeleccionAliado(ActionSeleccionada.REINFORCE));
+                btnParalisis.addActionListener(e -> pedirSeleccionEnemigo(ActionSeleccionada.PARALYZE));
+                btnPasar.addActionListener(e -> {
+                    if (heroeActuando != null) appendLog(heroeActuando.getNombre() + " pasa el turno.");
+                    terminarTurnoHeroe();
+                });
+
+                // Guardar botones para habilitarlos según tipo
+                panel.putClientProperty("btnAtacar", btnAtacar);
+                panel.putClientProperty("btnDefender", btnDefender);
+                panel.putClientProperty("btnProvocar", btnProvocar);
+                panel.putClientProperty("btnAumDef", btnAumDef);
+                panel.putClientProperty("btnCurar", btnCurar);
+                panel.putClientProperty("btnRestaurar", btnRestaurar);
+                panel.putClientProperty("btnEliminarEfecto", btnEliminarEfecto);
+                panel.putClientProperty("btnRevivir", btnRevivir);
+                panel.putClientProperty("btnSueno", btnSueno);
+                panel.putClientProperty("btnRefuerzo", btnRefuerzo);
+                panel.putClientProperty("btnParalisis", btnParalisis);
+                panel.putClientProperty("btnPasar", btnPasar);
+
+                return panel;
+            }
+
+            /**
+             * Prepara la interfaz para seleccionar un enemigo como objetivo de la
+             * acción indicada.
+             *
+             * Parámetros:
+             * - accion: enumeración que indica qué acción se realizará sobre el
+             *   enemigo seleccionado (ATTACK, PROVOKE, SLEEP, PARALYZE, ...).
+             *
+             * Efectos secundarios:
+             * - Cambia `accionSeleccionada` y `targetMode` a SELECT_ENEMY.
+             * - Añade una línea al log informando al jugador que debe seleccionar
+             *   un enemigo.
+             */
+            private void pedirSeleccionEnemigo(ActionSeleccionada accion) {
+                if (heroeActuando == null) return;
+                this.accionSeleccionada = accion;
+                this.targetMode = TargetMode.SELECT_ENEMY;
+                appendLog("Selecciona un enemigo para: " + accion.name());
+            }
+
+            /**
+             * Prepara la interfaz para seleccionar un aliado como objetivo de la
+             * acción indicada (curar, restaurar MP, revivir, etc.).
+             *
+             * Parámetros:
+             * - accion: enumeración con la acción a realizar sobre el aliado.
+             *
+             * Efectos secundarios:
+             * - Cambia `accionSeleccionada` y `targetMode` a SELECT_ALLY o
+             *   SELECT_REVIVE (si la acción es REVIVE).
+             * - Añade una línea al log instructiva.
+             */
+            private void pedirSeleccionAliado(ActionSeleccionada accion) {
+                if (heroeActuando == null) return;
+                this.accionSeleccionada = accion;
+                if (accion == ActionSeleccionada.REVIVE) {
+                    this.targetMode = TargetMode.SELECT_REVIVE;
+                    appendLog("Selecciona un aliado caído para revivir.");
+                } else {
+                    this.targetMode = TargetMode.SELECT_ALLY;
+                    appendLog("Selecciona un aliado para: " + accion.name());
+                }
+            }
+
+            /**
+             * Ejecuta la acción actualmente seleccionada por el héroe en el
+             * objetivo enemigo provisto.
+             *
+             * Reglas y comportamiento:
+             * - Comprueba que exista `heroeActuando` y que el `objetivo` no sea
+             *   nulo. Si no se cumple, no hace nada.
+             * - Según `accionSeleccionada` llama a los métodos del modelo
+             *   (`atacar`, `provocarEnemigo`, `LanzaHechizoSueño`, ...).
+             * - Registra textos descriptivos en el log.
+             * - Resetea `accionSeleccionada` y `targetMode` al finalizar.
+             * - Actualiza la UI con `refreshUI()` y termina el turno del héroe
+             *   llamando a `terminarTurnoHeroe()`.
+             *
+             * Parámetros:
+             * - objetivo: instancia de `Enemigo` que recibirá la acción.
+             */
+            private void aplicarAccionSobreEnemigo(Enemigo objetivo) {
+                if (heroeActuando == null || objetivo == null) return;
+
+                switch (accionSeleccionada) {
+                    case ATTACK -> {
+                        heroeActuando.atacar(objetivo);
+                        appendLog(heroeActuando.getNombre() + " ataca a " + objetivo.getNombre());
+                    }
+                    case PROVOKE -> {
+                        heroeActuando.provocarEnemigo(objetivo);
+                        appendLog(heroeActuando.getNombre() + " provoca a " + objetivo.getNombre());
+                    }
+                    case SLEEP -> {
+                        heroeActuando.LanzaHechizoSueño(objetivo);
+                        appendLog(heroeActuando.getNombre() + " lanza sueño sobre " + objetivo.getNombre());
+                    }
+                    case PARALYZE -> {
+                        heroeActuando.LanzaHechizoParalisis(objetivo);
+                        appendLog(heroeActuando.getNombre() + " lanza parálisis sobre " + objetivo.getNombre());
+                    }
+                    default -> appendLog("Acción no soportada sobre enemigo: " + accionSeleccionada);
+                }
+
+                accionSeleccionada = ActionSeleccionada.NONE;
+                targetMode = TargetMode.NONE;
+
+                refreshUI();
+                terminarTurnoHeroe();
+            }
+
+            /**
+             * Ejecuta la acción seleccionada por el héroe en un aliado del equipo.
+             *
+             * Comportamiento:
+             * - Valida `heroeActuando` y `aliado`.
+             * - Según `accionSeleccionada` delega en los métodos del modelo
+             *   (defender, curar, restaurarMana, revivir, etc.).
+             * - Es idempotente respecto a la selección: si la acción no aplica al
+             *   aliado o al héroe se registra un mensaje.
+             * - Al final resetea `accionSeleccionada` y `targetMode`, refresca la
+             *   UI y termina el turno del héroe.
+             *
+             * Parámetros:
+             * - aliado: instancia de `Heroe` que será afectada por la acción.
+             */
+            private void aplicarAccionSobreAliado(Heroe aliado) {
+                if (heroeActuando == null || aliado == null) return;
+
+                switch (accionSeleccionada) {
+                    case DEFEND -> {
+                        heroeActuando.defender(aliado);
+                        appendLog(heroeActuando.getNombre() + " defiende a " + aliado.getNombre());
+                    }
+                    case HEAL -> {
+                        heroeActuando.curar(aliado);
+                        appendLog(heroeActuando.getNombre() + " cura a " + aliado.getNombre());
+                    }
+                    case RESTORE_MP -> {
+                        heroeActuando.restaurarMana(aliado);
+                        appendLog(heroeActuando.getNombre() + " restaura MP a " + aliado.getNombre());
+                    }
+                    case REMOVE_EFFECT -> {
+                        heroeActuando.eliminarEfectoNegativo(aliado);
+                        appendLog(heroeActuando.getNombre() + " elimina efectos negativos de " + aliado.getNombre());
+                    }
+                    case REVIVE -> {
+                        heroeActuando.revivir(aliado);
+                        appendLog(heroeActuando.getNombre() + " revive a " + aliado.getNombre());
+                    }
+                    case REINFORCE -> {
+                        heroeActuando.LanzaHechizoRefuerzo(aliado);
+                        appendLog(heroeActuando.getNombre() + " lanza refuerzo sobre " + aliado.getNombre());
+                    }
+                    default -> appendLog("Acción no soportada sobre aliado: " + accionSeleccionada);
+                }
+
+                accionSeleccionada = ActionSeleccionada.NONE;
+                targetMode = TargetMode.NONE;
+
+                refreshUI();
+                terminarTurnoHeroe();
+            }
+
+            /**
+             * Inicia el turno del héroe en la posición `indice` del equipo.
+             *
+             * Lógica:
+             * - Si el índice está fuera de rango o no hay héroe/vivo en esa
+             *   posición, busca el siguiente héroe vivo.
+             * - Asigna `heroeActuando` y escribe en el log qué héroe está en turno.
+             * - Habilita las acciones disponibles según el tipo del héroe llamando
+             *   a `habilitarAccionesSegunTipo()`.
+             *
+             * Parámetros:
+             * - indice: posición en el array de héroes que debe actuar.
+             */
+            private void iniciarTurnoHeroe(int indice) {
+                Heroe[] heroes = batalla.getEquipoHeroes();
+                if (indice < 0 || indice >= heroes.length) return;
+                heroeActuando = heroes[indice];
+                if (heroeActuando == null || !heroeActuando.esta_vivo()) {
+                    indiceHeroeActual = buscarSiguienteHeroeVivo(indice + 1);
+                    if (indiceHeroeActual >= 0) iniciarTurnoHeroe(indiceHeroeActual);
+                    return;
+                }
+
+                appendLog("Turno del héroe: " + heroeActuando.getNombre() + " [" + heroeActuando.getTipo().name() + "]");
+                habilitarAccionesSegunTipo(heroeActuando.getTipo());
+            }
+
+            /**
+             * Habilita o deshabilita los botones de la botonera (`panelAcciones`)
+             * según el tipo de héroe que está en turno.
+             *
+             * Reglas:
+             * - Guerrero/Paladín: pueden defender/provocar/aumentar defensa.
+             * - Druida/Paladín: pueden curar y eliminar efectos.
+             * - Mago/Druida: pueden lanzar hechizos (sueño/refuerzo/parálisis según caso).
+             *
+             * Parámetros:
+             * - tipo: valor de `Tipo_Heroe` que condiciona qué botones estarán
+             *   disponibles.
+             */
+            private void habilitarAccionesSegunTipo(Tipo_Heroe tipo) {
+                JPanel panel = this.panelAcciones;
+                if (panel == null) return;
+
+                ((JButton) panel.getClientProperty("btnAtacar")).setEnabled(true);
+                ((JButton) panel.getClientProperty("btnDefender")).setEnabled(tipo == Tipo_Heroe.GUERRERO || tipo == Tipo_Heroe.PALADIN);
+                ((JButton) panel.getClientProperty("btnProvocar")).setEnabled(tipo == Tipo_Heroe.GUERRERO || tipo == Tipo_Heroe.PALADIN);
+                ((JButton) panel.getClientProperty("btnAumDef")).setEnabled(tipo == Tipo_Heroe.GUERRERO || tipo == Tipo_Heroe.PALADIN);
+                ((JButton) panel.getClientProperty("btnCurar")).setEnabled(tipo == Tipo_Heroe.DRUIDA || tipo == Tipo_Heroe.PALADIN);
+                ((JButton) panel.getClientProperty("btnRestaurar")).setEnabled(tipo == Tipo_Heroe.DRUIDA);
+                ((JButton) panel.getClientProperty("btnEliminarEfecto")).setEnabled(tipo == Tipo_Heroe.DRUIDA || tipo == Tipo_Heroe.PALADIN);
+                ((JButton) panel.getClientProperty("btnRevivir")).setEnabled(tipo == Tipo_Heroe.PALADIN);
+                ((JButton) panel.getClientProperty("btnSueno")).setEnabled(tipo == Tipo_Heroe.DRUIDA || tipo == Tipo_Heroe.MAGO);
+                ((JButton) panel.getClientProperty("btnRefuerzo")).setEnabled(tipo == Tipo_Heroe.MAGO);
+                ((JButton) panel.getClientProperty("btnParalisis")).setEnabled(tipo == Tipo_Heroe.MAGO);
+                ((JButton) panel.getClientProperty("btnPasar")).setEnabled(true);
+            }
+
+            /**
+             * Finaliza el turno del héroe actual y determina el siguiente paso:
+             * - Si existe otro héroe vivo, inicia su turno.
+             * - Si todos los héroes han actuado, lanza `ejecutarTurnoEnemigos()`
+             *   para procesar las acciones enemigas automáticamente.
+             */
+            private void terminarTurnoHeroe() {
+                indiceHeroeActual = buscarSiguienteHeroeVivo(indiceHeroeActual + 1);
+                heroeActuando = null;
+                if (indiceHeroeActual >= 0) {
+                    iniciarTurnoHeroe(indiceHeroeActual);
+                } else {
+                    ejecutarTurnoEnemigos();
+                }
+            }
+
+            /**
+             * Busca y retorna el índice del siguiente héroe vivo comenzando desde
+             * la posición `desde`.
+             *
+             * Retorna:
+             * - Índice del héroe vivo encontrado, o -1 si no hay ninguno.
+             */
+            private int buscarSiguienteHeroeVivo(int desde) {
+                Heroe[] heroes = batalla.getEquipoHeroes();
+                for (int i = desde; i < heroes.length; i++) {
+                    if (heroes[i] != null && heroes[i].esta_vivo()) return i;
+                }
+                return -1;
+            }
+
+            /**
+             * Ejecuta el turno de los enemigos en un hilo background (SwingWorker)
+             * para no bloquear la EDT.
+             *
+             * Flujo:
+             * - Itera los enemigos vivos y llama a su método de acción
+             *   (`actuar` en jefes o `atacarAleatorio` en normales).
+             * - Tras cada acción duerme brevemente (Thread.sleep) y solicita
+             *   refrescar la UI en la EDT.
+             * - Si detecta victoria durante el proceso, aborta el resto de
+             *   acciones.
+             * - Al terminar, reinicia el flujo de turnos pasando de nuevo a los
+             *   héroes (buscando el primer héroe vivo).
+             *
+             * Nota: maneja excepciones y registra errores en el log.
+             */
+            private void ejecutarTurnoEnemigos() {
+                appendLog("--- Turno de los enemigos ---");
+
+                SwingWorker<Void, Void> worker = new SwingWorker<>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        Enemigo[] enemigos = batalla.getEquipoEnemigos();
+                        for (Enemigo e : enemigos) {
+                            if (e != null && e.esta_vivo()) {
+                                appendLog("El enemigo " + e.getNombre() + " está actuando...");
+                                if (e instanceof JefeEnemigo) {
+                                    ((JefeEnemigo) e).actuar(batalla.getEquipoHeroes());
+                                } else {
+                                    e.atacarAleatorio(batalla.getEquipoHeroes());
+                                }
+                                Thread.sleep(600);
+                                SwingUtilities.invokeLater(() -> refreshUI());
+                                if (comprobarVictoria()) return null;
+                            }
+                        }
+                        return null;
+                    }
+
+                    @Override
+                    protected void done() {
+                        try {
+                            get();
+                        } catch (InterruptedException | ExecutionException ex) {
+                            appendLog("Error en turno de enemigos: " + ex.getMessage());
+                        }
+                        indiceHeroeActual = buscarSiguienteHeroeVivo(0);
+                        if (indiceHeroeActual >= 0) iniciarTurnoHeroe(indiceHeroeActual);
+                    }
+                };
+
+                worker.execute();
+            }
+
+            /**
+             * Comprueba si alguno de los bandos (héroes o enemigos) ha quedado sin
+             * miembros vivos, y registra el resultado en el log.
+             *
+             * Retorna:
+             * - true si hay un ganador (batalla finalizada), false en caso contrario.
+             */
+            private boolean comprobarVictoria() {
+                boolean heroesVivos = false, enemigosVivos = false;
+                for (Heroe h : batalla.getEquipoHeroes()) if (h != null && h.esta_vivo()) { heroesVivos = true; break; }
+                for (Enemigo e : batalla.getEquipoEnemigos()) if (e != null && e.esta_vivo()) { enemigosVivos = true; break; }
+
+                if (!heroesVivos) {
+                    appendLog("¡Los Enemigos han ganado la batalla!");
+                    return true;
+                } else if (!enemigosVivos) {
+                    appendLog("¡Los Héroes han ganado la batalla!");
+                    return true;
+                }
+                return false;
+            }
+
+            /**
+             * Actualiza las vistas de estado (nombres y barras de vida) para todos
+             * los héroes y enemigos en pantalla.
+             *
+             * Implementación actual:
+             * - Usa `getHp()` como máximo cuando no existe `getMaxHp()` en los
+             *   modelos (se recomienda añadir getters de máximos para mostrar
+             *   porcentajes correctos).
+             * - Actualiza el texto de la barra con el número de HP actual.
+             *
+             * Efectos secundarios: modifica los componentes UI existentes en
+             * `lblHeroeNombre`, `barraHpHeroes`, `lblEnemigoNombre`, `barraHpEnemigos`.
+             */
+            private void refreshUI() {
+                Heroe[] heroes = batalla.getEquipoHeroes();
+                for (int i = 0; i < heroes.length; i++) {
+                    Heroe h = heroes[i];
+                    if (h != null) {
+                        lblHeroeNombre[i].setText(h.getNombre() + " (" + h.getTipo().name() + ")");
+                        int max = Math.max(1, h.getHp());
+                        barraHpHeroes[i].setMaximum(max);
+                        barraHpHeroes[i].setValue(Math.max(0, h.getHp()));
+                        barraHpHeroes[i].setString(h.getHp() + " HP");
+                    } else {
+                        lblHeroeNombre[i].setText("Vacío");
+                        barraHpHeroes[i].setValue(0);
+                    }
+                }
+
+                Enemigo[] enemigos = batalla.getEquipoEnemigos();
+                for (int i = 0; i < enemigos.length; i++) {
+                    Enemigo e = enemigos[i];
+                    if (e != null) {
+                        lblEnemigoNombre[i].setText(e.getNombre() + " (" + e.getTipo().name() + ")");
+                        int max = Math.max(1, e.getHp());
+                        barraHpEnemigos[i].setMaximum(max);
+                        barraHpEnemigos[i].setValue(Math.max(0, e.getHp()));
+                        barraHpEnemigos[i].setString(e.getHp() + " HP");
+                    } else {
+                        lblEnemigoNombre[i].setText("Vacío");
+                        barraHpEnemigos[i].setValue(0);
                     }
                 }
             }
-            
-            // Procesar enemigos
-            int indexEnemigo = 0;
-            for (String linea : lineasEnemigos) {
-                linea = linea.trim();
-                if (!linea.isEmpty() && !linea.startsWith("Introduce") && indexEnemigo < 5) {
-                    if (linea.contains("(") && linea.contains(")")) {
-                        equipoEnemigos[indexEnemigo] = linea;
-                        indexEnemigo++;
-                    }
-                }
-            }
-            
-            actualizarPanelEstado();
-            btnIniciarBatalla.setEnabled(verificarEquipos());
-            
-            if (verificarEquipos()) {
-                JOptionPane.showMessageDialog(dialog, "¡Equipos cargados exitosamente!");
-            } else {
-                JOptionPane.showMessageDialog(dialog, "Necesitas al menos un héroe y un enemigo.");
-            }
-            
-            dialog.dispose();
-        });
-        
-        JButton btnCancelar = new JButton("Cancelar");
-        btnCancelar.setBackground(new Color(150, 0, 0));
-        btnCancelar.setForeground(Color.WHITE);
-        btnCancelar.addActionListener(ev -> dialog.dispose());
-        
-        panelBotones.add(btnCargar);
-        panelBotones.add(btnCancelar);
-        
-        dialog.add(panelPrincipal, BorderLayout.CENTER);
-        dialog.add(panelBotones, BorderLayout.SOUTH);
-        dialog.setVisible(true);
-    }
-    
-    /** Comprueba si hay al menos un héroe y un enemigo cargados. */
-    private boolean verificarEquipos() {
-        boolean hayHeroes = false, hayEnemigos = false;
-        
-        for (String heroe : equipoHeroes) {
-            if (heroe != null && !heroe.trim().isEmpty()) {
-                hayHeroes = true;
-                break;
+
+            /**
+             * Añade una línea al registro de la batalla (`areaLog`) en la EDT.
+             *
+             * Acepta una cadena `linea` y la concatena con un salto de línea.
+             * Garantiza que la modificación del componente Swing se haga en el
+             * hilo de despacho de eventos usando `SwingUtilities.invokeLater`.
+             *
+             * Parámetros:
+             * - linea: texto a añadir al log.
+             */
+            private void appendLog(String linea) {
+                SwingUtilities.invokeLater(() -> {
+                    areaLog.append(linea + "\n");
+                    areaLog.setCaretPosition(areaLog.getDocument().getLength());
+                });
             }
         }
-        
-        for (String enemigo : equipoEnemigos) {
-            if (enemigo != null && !enemigo.trim().isEmpty()) {
-                hayEnemigos = true;
-                break;
-            }
-        }
-        
-        return hayHeroes && hayEnemigos;
-    }
-    
-    /** Actualiza la UI de estado con imágenes y textos basados en los equipos actuales. */
-    private void actualizarPanelEstado() {
-        Component[] componentes = panelEstado.getComponents();
-        
-        // Actualizar héroes (primeros 5 componentes)
-        for (int i = 0; i < 5; i++) {
-            JPanel panelHeroe = (JPanel) componentes[i];
-            JLabel lblImagen = (JLabel) panelHeroe.getComponent(0); // Imagen
-            JLabel lblTexto = (JLabel) panelHeroe.getComponent(1);  // Texto
-            
-            if (equipoHeroes[i] != null && !equipoHeroes[i].trim().isEmpty()) {
-                String nombre = equipoHeroes[i].split(" \\(")[0];
-                String tipoCompleto = equipoHeroes[i];
-                
-                // Extraer tipo del héroe
-                String tipo = extraerTipoHeroe(tipoCompleto);
-                
-                // Actualizar imagen
-                ImageIcon imagenHeroe = ImagenUtil.obtenerImagenHeroeBoton(tipo);
-                if (imagenHeroe != null) {
-                    lblImagen.setIcon(imagenHeroe);
-                } else {
-                    lblImagen.setIcon(null);
-                }
-                
-                // Actualizar texto
-                lblTexto.setText("<html><center>" + nombre + "<br>(" + tipo + ")</center></html>");
-                lblTexto.setForeground(Color.GREEN);
-                panelHeroe.setBorder(BorderFactory.createLineBorder(Color.GREEN, 2));
-            } else {
-                lblImagen.setIcon(null);
-                lblTexto.setText("Héroe " + (i + 1) + ": [Vacío]");
-                lblTexto.setForeground(Color.LIGHT_GRAY);
-                panelHeroe.setBorder(BorderFactory.createLineBorder(Color.BLUE, 2));
-            }
-        }
-        
-        // Actualizar enemigos (siguientes 5 componentes)
-        for (int i = 0; i < 5; i++) {
-            JPanel panelEnemigo = (JPanel) componentes[i + 5];
-            JLabel lblImagen = (JLabel) panelEnemigo.getComponent(0); // Imagen
-            JLabel lblTexto = (JLabel) panelEnemigo.getComponent(1);  // Texto
-            
-            if (equipoEnemigos[i] != null && !equipoEnemigos[i].trim().isEmpty()) {
-                String nombre = equipoEnemigos[i].split(" \\(")[0];
-                String tipoCompleto = equipoEnemigos[i];
-                
-                // Extraer tipo del enemigo
-                String tipo = extraerTipoEnemigo(tipoCompleto);
-                
-                // Actualizar imagen
-                ImageIcon imagenEnemigo = ImagenUtil.obtenerImagenEnemigoBoton(tipo);
-                if (imagenEnemigo != null) {
-                    lblImagen.setIcon(imagenEnemigo);
-                } else {
-                    lblImagen.setIcon(null);
-                }
-                
-                // Actualizar texto
-                lblTexto.setText("<html><center>" + nombre + "<br>(" + tipo + ")</center></html>");
-                lblTexto.setForeground(Color.RED);
-                panelEnemigo.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-            } else {
-                lblImagen.setIcon(null);
-                lblTexto.setText("Enemigo " + (i + 1) + ": [Vacío]");
-                lblTexto.setForeground(Color.LIGHT_GRAY);
-                panelEnemigo.setBorder(BorderFactory.createLineBorder(Color.RED, 2));
-            }
-        }
-    }
-    
-    /** Configura las barras de salud y delega el control a BatallaManager. */
-    private void iniciarBatalla() {
-        if (!verificarEquipos()) {
-            JOptionPane.showMessageDialog(this,
-                "Necesitas al menos un héroe y un enemigo para iniciar la batalla.",
-                "Error",
-                JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-        
-        btnIniciarBatalla.setEnabled(false);
-        btnCargarEquipos.setEnabled(false);
-        
-        // Actualizar el panel de estado con las barras de salud del BatallaManager
-        panelEstado.removeAll();
-        panelEstado.setLayout(new GridLayout(2, 5, 5, 5));
-        
-        // Agregar barras de salud de héroes
-        for (JLabel label : batallaManager.getHeroHealthBars()) {
-            label.setOpaque(true);
-            label.setBackground(new Color(40, 40, 50));
-            label.setBorder(BorderFactory.createLineBorder(Color.BLUE, 1));
-            label.setFont(new Font("Arial", Font.PLAIN, 10));
-            panelEstado.add(label);
-        }
-        
-        // Agregar barras de salud de enemigos
-        for (JLabel label : batallaManager.getEnemyHealthBars()) {
-            label.setOpaque(true);
-            label.setBackground(new Color(40, 40, 50));
-            label.setBorder(BorderFactory.createLineBorder(Color.RED, 1));
-            label.setFont(new Font("Arial", Font.PLAIN, 10));
-            panelEstado.add(label);
-        }
-        
-        panelEstado.revalidate();
-        panelEstado.repaint();
-        
-        // Iniciar la batalla con los equipos cargados
-        batallaManager.iniciarBatallaConEquipos(equipoHeroes, equipoEnemigos);
-    }
-    
-    /** Extrae y normaliza el tipo del héroe desde el string completo. */
-    private String extraerTipoHeroe(String heroeCompleto) {
-        // Extrae el tipo entre paréntesis, ej: "Aragorn (GUERRERO)" -> "GUERRERO"
-        if (heroeCompleto.contains("(") && heroeCompleto.contains(")")) {
-            int inicio = heroeCompleto.lastIndexOf("(") + 1;
-            int fin = heroeCompleto.lastIndexOf(")");
-            String tipo = heroeCompleto.substring(inicio, fin).toUpperCase().trim();
-            
-            // Mapear tipos comunes
-            switch (tipo) {
-                case "WARRIOR":
-                case "GUERRERO":
-                    return "GUERRERO";
-                case "MAGE":
-                case "WIZARD":
-                case "MAGO":
-                    return "MAGO";
-                case "DRUID":
-                case "DRUIDA":
-                    return "DRUIDA";
-                case "PALADIN":
-                    return "PALADIN";
-                default:
-                    return tipo;
-            }
-        }
-        return "GUERRERO"; // Por defecto
-    }
-    
-    /** Extrae y normaliza el tipo del enemigo desde el string completo. */
-    private String extraerTipoEnemigo(String enemigoCompleto) {
-        // Extrae el tipo entre paréntesis, ej: "Orco Salvaje (ORCO)" -> "ORCO"
-        if (enemigoCompleto.contains("(") && enemigoCompleto.contains(")")) {
-            int inicio = enemigoCompleto.lastIndexOf("(") + 1;
-            int fin = enemigoCompleto.lastIndexOf(")");
-            String tipo = enemigoCompleto.substring(inicio, fin).toUpperCase().trim();
-            
-            // Mapear tipos comunes
-            switch (tipo) {
-                case "ORC":
-                case "ORCO":
-                    return "ORCO";
-                case "TROLL":
-                    return "TROLL";
-                case "DRAGON":
-                    return "DRAGON";
-                case "UNDEAD":
-                case "NOMUERTO":
-                    return "NOMUERTO";
-                case "GOLEM":
-                    return "GOLEM";
-                default:
-                    return tipo;
-            }
-        }
-        return "ORCO"; // Por defecto
-    }
-    
-    /** Cierra la vista y vuelve al menú anterior. */
-    private void volverAlMenu() {
-        dispose();
-    }
-}

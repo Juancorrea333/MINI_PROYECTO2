@@ -224,6 +224,12 @@ public class Heroe extends Personaje implements Sanador, Tanque, Hechicero {
             if (!objetivo.esta_vivo() && mp >= 25) {
                 mp -= 25;
                 objetivo.setHp(50);
+                // Asegurar que el personaje revivido pueda actuar: limpiar efectos y marcas
+                objetivo.turnosParalisis = 0;
+                objetivo.turnosSueno = 0;
+                objetivo.removerProvocacion();
+                objetivo.removerDefensa();
+                objetivo.esta_vivo = true; // asegurar bandera activa
                 System.out.println(nombre + " ha revivido a " + objetivo.getNombre() + " con 50 puntos de vida.");
             } else if(objetivo.esta_vivo()) {
                 System.out.println(objetivo.getNombre() + " ya está vivo.");

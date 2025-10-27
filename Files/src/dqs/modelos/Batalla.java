@@ -163,10 +163,13 @@ public class Batalla {
      */
     public void crearEquipoHeroesPorDefecto() {
         System.out.println("\n=== CREANDO EQUIPO DE HÉROES POR DEFECTO PARA PRUEBAS ===");
+        // Asegurarse de que los atributos respeten los rangos definidos en Tipo_Heroe
         equipoHeroes[0] = new Heroe("Aldor", Tipo_Heroe.GUERRERO, 220, 20, 100, 25, 20);
-        equipoHeroes[1] = new Heroe("Merina", Tipo_Heroe.MAGO, 90, 200, 35, 80, 18);
+        // MERINA (MAGO): ataque y defensa ajustados para cumplir los rangos del mago
+        equipoHeroes[1] = new Heroe("Merina", Tipo_Heroe.MAGO, 90, 200, 60, 20, 18);
         equipoHeroes[2] = new Heroe("Tharok", Tipo_Heroe.PALADIN, 160, 80, 120, 30, 16);
-        equipoHeroes[3] = new Heroe("Lyra", Tipo_Heroe.DRUIDA, 120, 140, 30, 70, 22);
+        // LYRA (DRUIDA): ataque y defensa ajustados para cumplir los rangos del druida
+        equipoHeroes[3] = new Heroe("Lyra", Tipo_Heroe.DRUIDA, 120, 140, 80, 25, 22);
         System.out.println("Equipo de héroes por defecto creado.");
     }
 

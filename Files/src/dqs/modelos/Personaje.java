@@ -25,6 +25,8 @@ public abstract class Personaje {
     public void setHp(int hp) {
         if (hp < 0) this.hp = 0;
         else this.hp = hp;
+        // Actualizar el estado de vida cuando se modifica el HP
+        this.esta_vivo = this.hp > 0;
     }
     public void setMp(int mp) {
         if (mp < 0) this.mp = 0;

@@ -43,6 +43,45 @@ public class VistaIniciarBatallaNueva extends JFrame {
         NONE, ATTACK, DEFEND, PROVOKE, INCREASE_DEF, HEAL, RESTORE_MP, REMOVE_EFFECT, REVIVE, SLEEP, REINFORCE, PARALYZE, PASS
     }
 
+    /**
+     * Carga un recurso de imagen desde el classpath y lo escala al tamaño
+     * solicitado. Busca en el paquete `dqs.vista.utilidades` que contiene
+     * las imágenes del proyecto.
+     *
+     * @param recurso ruta dentro del classpath (por ejemplo "/dqs/vista/utilidades/dragon.png")
+     * @param w ancho en píxeles
+     * @param h alto en píxeles
+     * @return ImageIcon escalado, o null si no se encuentra el recurso.
+     */
+    private ImageIcon cargarIcono(String recurso, int w, int h) {
+        try {
+            // Intento por classpath primero
+            java.net.URL url = getClass().getResource(recurso);
+            if (url != null) {
+                Image img = new ImageIcon(url).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+                return new ImageIcon(img);
+            }
+
+            // Fallback forzado: buscar en la ruta de desarrollo exacta Files/src/dqs/vista/utilidades/
+            String nombreArchivo = recurso;
+            if (nombreArchivo.contains("/")) {
+                nombreArchivo = nombreArchivo.substring(nombreArchivo.lastIndexOf('/') + 1);
+            }
+            String proyectoRoot = System.getProperty("user.dir");
+            java.io.File f = new java.io.File(proyectoRoot + java.io.File.separator + "Files" + java.io.File.separator + "src" + java.io.File.separator + "dqs" + java.io.File.separator + "vista" + java.io.File.separator + "utilidades" + java.io.File.separator + nombreArchivo);
+            if (f.exists()) {
+                Image img = new ImageIcon(f.getAbsolutePath()).getImage().getScaledInstance(w, h, Image.SCALE_SMOOTH);
+                return new ImageIcon(img);
+            }
+
+            appendLog("Recurso no encontrado en classpath ni en Files/src/...: " + recurso + " (buscado en " + f.getAbsolutePath() + ")");
+            return null;
+        } catch (Exception ex) {
+            appendLog("No se pudo cargar imagen: " + recurso + " -> " + ex.getMessage());
+            return null;
+        }
+    }
+
     public VistaIniciarBatallaNueva() {
         setTitle("Dragon Quest VIII - Batalla");
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -168,6 +207,45 @@ public class VistaIniciarBatallaNueva extends JFrame {
 
                 JLabel lblIcon = new JLabel();
                 lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
+
+                // Intentar cargar un icono representativo desde resources
+                // Para jefes se usa "dragon.png" (siempre que exista en utilidades)
+                if (esHeroe) {
+                    Heroe h = batalla.getEquipoHeroes()[idx];
+                    if (h != null) {
+                        // Mapear tipos de héroe a imágenes (nombres aproximados en la carpeta utilidades)
+                        switch (h.getTipo()) {
+                            case MAGO -> lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/Un mago de videojueg.png", 80, 80));
+                            case GUERRERO -> lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/Un guerrero de video.png", 80, 80));
+                            case PALADIN -> lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/Un paladín de videoj.png", 80, 80));
+                            case DRUIDA -> lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/Un druida teriantrop.png", 80, 80));
+                            default -> lblIcon.setIcon(null);
+                        }
+                    }
+                } else {
+                    Enemigo e = batalla.getEquipoEnemigos()[idx];
+                    if (e != null) {
+                        // Si es jefe, preferimos la imagen del dragón
+                        if (e instanceof JefeEnemigo) {
+                            lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/dragon.png", 100, 100));
+                        } else {
+                            // Mapear algunos tipos de enemigo comunes a imágenes disponibles
+                            String nombreTipo = e.getTipo().name().toLowerCase();
+                            if (nombreTipo.contains("orco")) {
+                                lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/dibuja un orco.png", 100, 100));
+                            } else if (nombreTipo.contains("troll")) {
+                                lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/dibuja un troll.png", 100, 100));
+                            } else if (nombreTipo.contains("golem") || nombreTipo.contains("golem")) {
+                                lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/golem de piedra para.png", 100, 100));
+                            } else if (nombreTipo.contains("dragon") || nombreTipo.contains("rey_dragon") ) {
+                                lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/dragon.png", 100, 100));
+                            } else {
+                                // recurso genérico si no se encuentra mapping
+                                lblIcon.setIcon(cargarIcono("/dqs/vista/utilidades/dragon.png", 100, 100));
+                            }
+                        }
+                    }
+                }
 
                 panel.add(lblIcon, BorderLayout.CENTER);
                 panel.add(lblNombre, BorderLayout.NORTH);

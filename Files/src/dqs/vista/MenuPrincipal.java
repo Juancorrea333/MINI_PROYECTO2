@@ -21,31 +21,9 @@ public class MenuPrincipal extends JFrame {
 
         // Cargar imagen de fondo
         try {
-            // Intentar múltiples rutas posibles
-            File imgFile = null;
-            String[] posiblesRutas = {
-                "src/dqs/utilidades/Fondo de menú princi.png",
-                "Files/src/dqs/utilidades/Fondo de menú princi.png",
-                "../src/dqs/utilidades/Fondo de menú princi.png",
-                "../../src/dqs/utilidades/Fondo de menú princi.png"
-            };
-            
-            for (String ruta : posiblesRutas) {
-                File f = new File(ruta);
-                if (f.exists()) {
-                    imgFile = f;
-                    break;
-                }
-            }
-            
-            if (imgFile != null) {
-                backgroundImage = ImageIO.read(imgFile);
-                System.out.println("✓ Imagen de fondo cargada desde: " + imgFile.getAbsolutePath());
-            } else {
-                System.err.println("⚠️ No se encontró la imagen de fondo en ninguna ruta conocida");
-            }
+            backgroundImage = ImageIO.read(new File("src/dqs/utilidades/Fondo de menú princi.png"));
         } catch (IOException e) {
-            System.err.println("⚠️ Error al cargar la imagen de fondo: " + e.getMessage());
+            System.err.println("⚠️ No se pudo cargar la imagen de fondo: " + e.getMessage());
         }
 
         // Panel personalizado con fondo
@@ -73,7 +51,7 @@ public class MenuPrincipal extends JFrame {
         JButton btnCrear = crearBoton("1. Crear Equipos");
         JButton btnMostrar = crearBoton("2. Mostrar Equipos");
         JButton btnBatalla = crearBoton("3. Iniciar Batalla");
-        JButton btnPruebas = crearBoton("4. Prueba de Mecanicas");
+        JButton btnPruebas = crearBoton("4. Prueba de Mecánicas");
         JButton btnSalir = crearBoton("5. Salir");
 
         // Layout con espaciado vertical
@@ -112,25 +90,41 @@ public class MenuPrincipal extends JFrame {
         btnPruebas.addActionListener(_ -> probarMecanicas());
     }
 
-    // Metodos de navegacion entre vistas
+    // Métodos temporales para funcionalidad de botones
     private void abrirVentanaCrearEquipos() {
-        VistaCrearEquipos vistaCrearEquipos = new VistaCrearEquipos();
-        vistaCrearEquipos.setVisible(true);
+        JOptionPane.showMessageDialog(this, 
+            """
+            🛡️ Función 'Crear Equipos' en desarrollo.
+            Próximamente podrás crear y personalizar tus equipos.""", 
+            "Crear Equipos", 
+            JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void mostrarEquipos() {
-        VistaMostrarEquipos vistaMostrarEquipos = new VistaMostrarEquipos();
-        vistaMostrarEquipos.setVisible(true);
+        JOptionPane.showMessageDialog(this, 
+            """
+            👥 Función 'Mostrar Equipos' en desarrollo.
+            Aquí podrás ver todos los equipos creados.""", 
+            "Mostrar Equipos", 
+            JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void iniciarBatalla() {
-        VistaIniciarBatalla vistaIniciarBatalla = new VistaIniciarBatalla();
-        vistaIniciarBatalla.setVisible(true);
+        JOptionPane.showMessageDialog(this, 
+            """
+            ⚔️ Función 'Iniciar Batalla' en desarrollo.
+            ¡Prepárate para épicas batallas de Dragon Quest!""", 
+            "Iniciar Batalla", 
+            JOptionPane.INFORMATION_MESSAGE);
     }
 
     private void probarMecanicas() {
-        VistaPruebaMecanicas vistaPruebaMecanicas = new VistaPruebaMecanicas();
-        vistaPruebaMecanicas.setVisible(true);
+        JOptionPane.showMessageDialog(this, 
+            """
+            🧪 Función 'Prueba de Mecánicas' en desarrollo.
+            Aquí podrás probar las mecánicas del juego.""", 
+            "Prueba de Mecánicas", 
+            JOptionPane.INFORMATION_MESSAGE);
     }
 
     private JButton crearBoton(String texto) {
@@ -181,31 +175,12 @@ public class MenuPrincipal extends JFrame {
         };
         
         boton.setFocusPainted(false);
-        boton.setFont(new Font("SansSerif", Font.PLAIN, 18));
-        boton.setForeground(Color.WHITE);
-        boton.setBackground(new Color(0, 0, 0, 120)); // Semi-transparente negro
-        boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
+        boton.setFont(new Font("SansSerif", Font.BOLD, 18));
+        boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 3));
+        boton.setContentAreaFilled(false);
         boton.setOpaque(false);
-        boton.setContentAreaFilled(true);
+        boton.setPreferredSize(new Dimension(300, 50));
 
-        // Efecto hover
-        boton.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseEntered(MouseEvent e) {
-                boton.setForeground(new Color(255, 255, 150));
-                boton.setBackground(new Color(50, 50, 0, 150)); // Fondo dorado semi-transparente
-                boton.setBorder(BorderFactory.createLineBorder(new Color(255, 255, 150), 2));
-                boton.repaint(); // Forzar repintado
-            }
-
-            @Override
-            public void mouseExited(MouseEvent e) {
-                boton.setForeground(Color.WHITE);
-                boton.setBackground(new Color(0, 0, 0, 120)); // Volver al fondo original
-                boton.setBorder(BorderFactory.createLineBorder(Color.WHITE, 2));
-                boton.repaint(); // Forzar repintado
-            }
-        });
         return boton;
     }
 

@@ -8,10 +8,14 @@ public abstract class Personaje {
     protected int defensa;
     protected int velocidad;
     protected boolean esta_vivo = true;
+    protected boolean esta_paralizado = false;
+    // Replaced boolean flags by counters so we can track duration of effects
+    protected int turnosParalisis = 0; // turnos restantes de parálisis
     protected boolean siendo_defendido = false;
-    protected Personaje defensor = null;
+    protected int turnosSueno = 0; // turnos restantes de sueño
     protected boolean esta_provocado = false;
     protected Personaje provocador = null;
+    protected Personaje defensor = null;
     public String getNombre() { return nombre; }
     public int getHp() { return hp; }
     public int getMp() { return mp; }
@@ -21,6 +25,8 @@ public abstract class Personaje {
     public void setHp(int hp) {
         if (hp < 0) this.hp = 0;
         else this.hp = hp;
+        // Actualizar el estado de vida cuando se modifica el HP
+        this.esta_vivo = this.hp > 0;
     }
     public void setMp(int mp) {
         if (mp < 0) this.mp = 0;
@@ -36,6 +42,8 @@ public abstract class Personaje {
         this.esta_vivo = hp > 0;
     }
     public void recibir_daño(int cantidad){
+        
+        /*int dañoFinal = cantidad;*/
         int dañoFinal;
         
         // Si está siendo defendido por un tanque, aplicar defensa combinada
@@ -68,6 +76,52 @@ public abstract class Personaje {
         return esta_vivo;
     }
     
+    // Método protegido para aumentar el ataque
+    protected void aumentarAtaque(int aumento) {
+        if (aumento <= 0) return;
+        this.ataque += aumento;
+
+    }
+
+    // Métodos para manejar el estado de sueño
+    /**
+     * Aplica sueño durante 'turnos' turnos. Durante ese tiempo el personaje
+     * no podrá actuar. Se registra la duración en `turnosSueno`.
+     */
+    public void aplicarSueno(int turnos) {
+        if (turnos <= 0) return;
+        this.turnosSueno = Math.max(this.turnosSueno, turnos);
+        System.out.println(this.nombre + " ha caído dormido por " + turnos + " turnos!");
+    }
+
+    /**
+     * Aplica parálisis durante 'turnos' turnos. Durante ese tiempo el personaje
+     * no podrá actuar. Se registra la duración en `turnosParalisis`.
+     */
+    public void aplicarParalisis(int turnos) {
+        if (turnos <= 0) return;
+        this.turnosParalisis = Math.max(this.turnosParalisis, turnos);
+        System.out.println(this.nombre + " ha sido paralizado por " + turnos + " turno(s)!");
+    }
+
+    /**
+     * Comprueba si el personaje puede actuar en este turno. Si tiene efectos
+     * activos, decrementa sus contadores y devuelve false.
+     */
+    public boolean puedeActuar() {
+        if (this.turnosParalisis > 0) {
+            this.turnosParalisis--;
+            System.out.println(this.nombre + " está paralizado y pierde el turno. Turnos de parálisis restantes: " + this.turnosParalisis);
+            return false;
+        }
+        if (this.turnosSueno > 0) {
+            this.turnosSueno--;
+            System.out.println(this.nombre + " está dormido y pierde el turno. Turnos de sueño restantes: " + this.turnosSueno);
+            return false;
+        }
+        return true;
+    }
+
     // Métodos para manejar la defensa por tanque
     public void recibirDefensa(Personaje tanque) {
         this.siendo_defendido = true;

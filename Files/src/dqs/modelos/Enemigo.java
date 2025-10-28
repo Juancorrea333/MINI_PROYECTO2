@@ -1,6 +1,6 @@
 package dqs.modelos;
 
-public class Enemigo extends Personaje implements Agresivo {
+public class Enemigo extends Personaje implements Agresivo, Jefe {
 	private final Tipo_Enemigo tipo;
 
 	public Enemigo(String nombre, int hp, int mp, int ataque, int defensa, int velocidad, Tipo_Enemigo tipo) {
@@ -16,6 +16,26 @@ public class Enemigo extends Personaje implements Agresivo {
             );
         }
 	}
+
+    /**
+     * Constructor alternativo que permite omitir la validación de atributos.
+     * Útil para crear jefes con rangos propios definidos en Tipo_JefeEnemigo.
+     */
+    public Enemigo(String nombre, int hp, int mp, int ataque, int defensa, int velocidad, Tipo_Enemigo tipo, boolean skipValidation) {
+        super(nombre, hp, mp, ataque, defensa, velocidad);
+        this.tipo = tipo;
+        if (!skipValidation) {
+            if(!tipo.validarAtributos(hp, mp, ataque, defensa)) {
+                throw new IllegalArgumentException(
+                    "Atributos fuera del rango permitido para el tipo " + tipo.name() +
+                    "\nHP: " + tipo.getMinHp() + " - " + tipo.getMaxHp() +
+                    " |MP: " + tipo.getMinMp() + " - " + tipo.getMaxMp() +
+                    " |Ataque: " + tipo.getMinAtaque() + " - " + tipo.getMaxAtaque() +
+                    " |Defensa: " + tipo.getMinDefensa() + " - " + tipo.getMaxDefensa()
+                );
+            }
+        }
+    }
 
      public void mostrarEstado() {
         System.out.println("\n " + nombre + " [" + tipo.name() + "]");
@@ -88,6 +108,9 @@ public class Enemigo extends Personaje implements Agresivo {
 
     // Permite al enemigo elegir y atacar a un héroe vivo del array proporcionado
     public void atacarAleatorio(Heroe[] heroes) {
+        // Respetar estados (parálisis/sueño)
+        if (!this.puedeActuar()) return;
+
         if (heroes == null || heroes.length == 0) {
             System.out.println(this.nombre + " no tiene héroes a los que atacar.");
             return;
@@ -98,6 +121,17 @@ public class Enemigo extends Personaje implements Agresivo {
         } else {
             System.out.println(this.nombre + " no encontró héroes vivos para atacar.");
         }
+    }
+
+    @Override
+    public int TurnosParaAtacar() {
+        byte turnos = 2;
+        if (turnos >= 0) {
+            turnos--;
+        } else if (turnos < 0) {
+            turnos = 2;
+        }
+        return turnos; // Por ejemplo, el jefe ataca cada 2 turnos
     }
 
     @Override
@@ -126,5 +160,12 @@ public class Enemigo extends Personaje implements Agresivo {
          " | Ataque: " + ataque +
          " | Defensa: " + defensa +
          " | Velocidad: " + velocidad;
+    }
+
+    @Override
+    public void AtacarATodos() {
+        // Si deseas un objetivo arreglo, deberías pasarlo; aquí asumimos que atacará a un conjunto global
+        // Implementación por defecto: no hace nada si no hay contexto. Puedes llamar a atacarAleatorio en un bucle
+        System.out.println(this.nombre + " intenta usar AtacarATodos(), pero no hay contexto de objetivos.");
     }
 }

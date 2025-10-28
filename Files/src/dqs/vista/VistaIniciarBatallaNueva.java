@@ -1,12 +1,9 @@
 package dqs.vista;
-
 import dqs.modelos.*;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.concurrent.ExecutionException;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 /**
@@ -19,16 +16,16 @@ public class VistaIniciarBatallaNueva extends JFrame {
     private JPanel panelEstado;
     private JTextArea areaLog;
     private JButton btnVolverMenu;
-    private JPanel panelAcciones;
+    private final JPanel panelAcciones;
 
     // Visuales por personaje
-    private JPanel[] panelHeroesUI;
-    private JLabel[] lblHeroeNombre;
-    private JProgressBar[] barraHpHeroes;
+    private final JPanel[] panelHeroesUI;
+    private final JLabel[] lblHeroeNombre;
+    private final JProgressBar[] barraHpHeroes;
 
-    private JPanel[] panelEnemigosUI;
-    private JLabel[] lblEnemigoNombre;
-    private JProgressBar[] barraHpEnemigos;
+    private final JPanel[] panelEnemigosUI;
+    private final JLabel[] lblEnemigoNombre;
+    private final JProgressBar[] barraHpEnemigos;
 
     // Turnos
     private int indiceHeroeActual = 0; // índice del héroe que debe actuar
@@ -614,39 +611,47 @@ public class VistaIniciarBatallaNueva extends JFrame {
             private void ejecutarTurnoEnemigos() {
                 appendLog("--- Turno de los enemigos ---");
 
-                SwingWorker<Void, Void> worker = new SwingWorker<>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        Enemigo[] enemigos = batalla.getEquipoEnemigos();
-                        for (Enemigo e : enemigos) {
-                            if (e != null && e.esta_vivo()) {
-                                appendLog("El enemigo " + e.getNombre() + " está actuando...");
-                                if (e instanceof JefeEnemigo) {
-                                    ((JefeEnemigo) e).actuar(batalla.getEquipoHeroes());
-                                } else {
-                                    e.atacarAleatorio(batalla.getEquipoHeroes());
-                                }
-                                Thread.sleep(600);
-                                SwingUtilities.invokeLater(() -> refreshUI());
-                                if (comprobarVictoria()) return null;
-                            }
-                        }
-                        return null;
+                // Usar un Timer para espaciar las acciones de los enemigos en lugar de
+                // bloquear el hilo con Thread.sleep dentro de un bucle.
+                Enemigo[] enemigos = batalla.getEquipoEnemigos();
+                final int[] indice = {0};
+
+                javax.swing.Timer timer = new javax.swing.Timer(600, null);
+                timer.addActionListener(ev -> {
+                    // Avanzar hasta el siguiente enemigo vivo
+                    while (indice[0] < enemigos.length && (enemigos[indice[0]] == null || !enemigos[indice[0]].esta_vivo())) {
+                        indice[0]++;
                     }
 
-                    @Override
-                    protected void done() {
-                        try {
-                            get();
-                        } catch (InterruptedException | ExecutionException ex) {
-                            appendLog("Error en turno de enemigos: " + ex.getMessage());
-                        }
+                    if (indice[0] >= enemigos.length) {
+                        // Terminar el turno de enemigos y pasar el turno a los héroes
+                        timer.stop();
                         indiceHeroeActual = buscarSiguienteHeroeVivo(0);
                         if (indiceHeroeActual >= 0) iniciarTurnoHeroe(indiceHeroeActual);
+                        return;
                     }
-                };
 
-                worker.execute();
+                    Enemigo e = enemigos[indice[0]];
+                    appendLog("El enemigo " + e.getNombre() + " está actuando...");
+                    if (e instanceof JefeEnemigo jefeEnemigo) {
+                        jefeEnemigo.actuar(batalla.getEquipoHeroes());
+                    } else {
+                        e.atacarAleatorio(batalla.getEquipoHeroes());
+                    }
+
+                    // Refrescar la UI y comprobar victoria después de la acción
+                    refreshUI();
+                    if (comprobarVictoria()) {
+                        timer.stop();
+                        return;
+                    }
+
+                    // Prepararse para el siguiente enemigo en el siguiente tick
+                    indice[0]++;
+                });
+
+                timer.setInitialDelay(0);
+                timer.start();
             }
 
             /**

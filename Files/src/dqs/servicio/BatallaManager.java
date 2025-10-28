@@ -587,6 +587,7 @@ private boolean ejecutarAccionHeroe(Heroe heroe, int opcion) {
      * Convierte un arreglo de `Heroe` a `Personaje[]` para reutilizar
      * APIs que trabajen con el tipo base `Personaje`.
      */
+    @SuppressWarnings("unused")
     private Personaje[] convertirHeroesAPersonajes(Heroe[] heroes) {
         Personaje[] personajes = new Personaje[heroes.length];
         System.arraycopy(heroes, 0, personajes, 0, heroes.length);

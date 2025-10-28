@@ -83,7 +83,9 @@ public class Heroe extends Personaje implements Sanador, Tanque, Hechicero {
         System.out.println("HP: " + hp + "\n"+ " MP: " + mp + "\n" +
                            " | Ataque: " + ataque +"\n" + " | Defensa: " + defensa + "\n" +
                            " | Velocidad: " + velocidad);
-        System.out.println("\n" + "Descripción: " + tipo.getDescripcion());
+        System.out.println("""
+                           
+                           Descripción: """ + tipo.getDescripcion());
         System.out.println("--------------------------------------");
     }
 

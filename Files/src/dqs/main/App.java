@@ -275,8 +275,7 @@ public class App {
 */
 
 package dqs.main;
-
-import dqs.vista.VistaIniciarBatallaNueva;
+import dqs.vista.*;
 import javax.swing.SwingUtilities;
 
 /**
@@ -300,6 +299,7 @@ public class App {
      * Crea y muestra la vista principal en el EDT. Cualquier excepción se
      * imprime en la salida de error para facilitar depuración.
      */
+    @SuppressWarnings("CallToPrintStackTrace")
     private static void mostrarVistaIniciarBatallaNueva() {
         try {
             SwingUtilities.invokeLater(() -> new VistaIniciarBatallaNueva());

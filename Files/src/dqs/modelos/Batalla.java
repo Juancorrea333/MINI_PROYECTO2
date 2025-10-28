@@ -67,7 +67,7 @@ public class Batalla {
         try {
             String line = scanner.nextLine();
             posicion = Integer.parseInt(line) - 1;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             System.out.println(" Posición inválida (entrada no numérica).");
             return;
         }
@@ -83,7 +83,7 @@ public class Batalla {
             try {
                 String tline = scanner.nextLine();
                 tipoIndex = Integer.parseInt(tline) - 1;
-            } catch (Exception ex) {
+            } catch (NumberFormatException ex) {
                 System.out.println(" Tipo inválido (entrada no numérica).");
                 return;
             }
@@ -126,7 +126,7 @@ public class Batalla {
         try {
             String line = scanner.nextLine();
             posicion = Integer.parseInt(line) - 1;
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             System.out.println(" Posición inválida (entrada no numérica).");
             return;
         }

@@ -5,7 +5,7 @@ package dqs.modelos;
  * - Puede ejecutar una habilidad especial cada N turnos (por defecto 2)
  * - Puede atacar a todos los héroes (área)
  */
-public class JefeEnemigo extends Enemigo implements Jefe {
+public class JefeEnemigo extends Enemigo {
     private int turnosHastaEspecial;
     private final int cooldownEspecial;
 

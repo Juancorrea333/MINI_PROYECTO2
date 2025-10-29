@@ -25,10 +25,12 @@ public class VistaIniciarBatallaNueva extends JFrame {
     private JPanel[] panelHeroesUI;
     private JLabel[] lblHeroeNombre;
     private JProgressBar[] barraHpHeroes;
+    private JProgressBar[] barraMpHeroes;
 
     private JPanel[] panelEnemigosUI;
     private JLabel[] lblEnemigoNombre;
     private JProgressBar[] barraHpEnemigos;
+    private JProgressBar[] barraMpEnemigos;
 
     // Turnos
     private int indiceHeroeActual = 0; // índice del héroe que debe actuar
@@ -134,10 +136,13 @@ public class VistaIniciarBatallaNueva extends JFrame {
                 panelHeroesUI = new JPanel[heroes.length];
                 lblHeroeNombre = new JLabel[heroes.length];
                 barraHpHeroes = new JProgressBar[heroes.length];
+                barraMpHeroes = new JProgressBar[heroes.length];
 
                 panelEnemigosUI = new JPanel[enemigos.length];
                 lblEnemigoNombre = new JLabel[enemigos.length];
                 barraHpEnemigos = new JProgressBar[enemigos.length];
+                barraMpEnemigos = new JProgressBar[enemigos.length];
+
 
                 // Construir UI de héroes
                 for (int i = 0; i < heroes.length; i++) {
@@ -202,8 +207,25 @@ public class VistaIniciarBatallaNueva extends JFrame {
                 lblNombre.setForeground(Color.WHITE);
                 lblNombre.setFont(new Font("Arial", Font.BOLD, 12));
 
-                JProgressBar barra = new JProgressBar();
+                JPanel panelBarras = new JPanel();
+                panelBarras.setLayout(new BoxLayout(panelBarras, BoxLayout.Y_AXIS));
+                panelBarras.setOpaque(false);
+
+                JProgressBar barra = new JProgressBar(0,100);
+                //barra.setValue(80);
                 barra.setStringPainted(true);
+                barra.setForeground(Color.BLUE);
+                barra.setBackground(Color.DARK_GRAY);
+                panelBarras.add(barra);
+
+                
+
+                JProgressBar barra2 = new JProgressBar(0,300);
+                //barra2.setValue(60);
+                barra2.setStringPainted(true);
+                barra2.setForeground(Color.RED);
+                barra2.setBackground(Color.DARK_GRAY);
+                panelBarras.add(barra2);
 
                 JLabel lblIcon = new JLabel();
                 lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
@@ -249,11 +271,12 @@ public class VistaIniciarBatallaNueva extends JFrame {
 
                 panel.add(lblIcon, BorderLayout.CENTER);
                 panel.add(lblNombre, BorderLayout.NORTH);
-                panel.add(barra, BorderLayout.SOUTH);
+                panel.add(panelBarras, BorderLayout.SOUTH);
 
                 if (esHeroe) {
                     lblHeroeNombre[idx] = lblNombre;
                     barraHpHeroes[idx] = barra;
+                    barraMpHeroes[idx] = barra2;
                     panel.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -270,6 +293,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
                 } else {
                     lblEnemigoNombre[idx] = lblNombre;
                     barraHpEnemigos[idx] = barra;
+                    barraMpEnemigos[idx] = barra2;
                     panel.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -293,6 +317,7 @@ public class VistaIniciarBatallaNueva extends JFrame {
              * Retorna:
              * - JPanel con la botonera totalmente configurada.
              */
+
             private JPanel crearPanelAcciones() {
                 JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
                 panel.setBackground(new Color(20, 20, 30));
@@ -691,12 +716,17 @@ public class VistaIniciarBatallaNueva extends JFrame {
                     if (h != null) {
                         lblHeroeNombre[i].setText(h.getNombre() + " (" + h.getTipo().name() + ")");
                         int max = Math.max(1, h.getHp());
+                        int max2 = Math.max(1,h.getMp());
                         barraHpHeroes[i].setMaximum(max);
                         barraHpHeroes[i].setValue(Math.max(0, h.getHp()));
                         barraHpHeroes[i].setString(h.getHp() + " HP");
+                        barraMpHeroes[i].setMaximum(max2);
+                        barraMpHeroes[i].setValue(Math.max(0, h.getMp()));
+                        barraMpHeroes[i].setString(h.getMp() + "MP");
                     } else {
                         lblHeroeNombre[i].setText("Vacío");
                         barraHpHeroes[i].setValue(0);
+                        barraMpHeroes[i].setValue(0);
                     }
                 }
 
@@ -706,12 +736,17 @@ public class VistaIniciarBatallaNueva extends JFrame {
                     if (e != null) {
                         lblEnemigoNombre[i].setText(e.getNombre() + " (" + e.getTipo().name() + ")");
                         int max = Math.max(1, e.getHp());
+                        int max2 =  Math.max(1, e.getMp());
                         barraHpEnemigos[i].setMaximum(max);
                         barraHpEnemigos[i].setValue(Math.max(0, e.getHp()));
                         barraHpEnemigos[i].setString(e.getHp() + " HP");
+                        barraMpEnemigos[i].setMaximum(max2);
+                        barraMpEnemigos[i].setValue(Math.max(0, e.getMp()));
+                        barraMpEnemigos[i].setString(e.getMp() + "MP");
                     } else {
                         lblEnemigoNombre[i].setText("Vacío");
                         barraHpEnemigos[i].setValue(0);
+                        barraMpEnemigos[i].setValue(0);
                     }
                 }
             }
@@ -733,3 +768,6 @@ public class VistaIniciarBatallaNueva extends JFrame {
                 });
             }
         }
+        
+
+

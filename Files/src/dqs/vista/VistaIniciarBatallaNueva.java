@@ -1,9 +1,12 @@
 package dqs.vista;
+
 import dqs.modelos.*;
+
+import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import javax.swing.*;
+import java.util.concurrent.ExecutionException;
 import javax.swing.border.LineBorder;
 
 /**
@@ -16,26 +19,16 @@ public class VistaIniciarBatallaNueva extends JFrame {
     private JPanel panelEstado;
     private JTextArea areaLog;
     private JButton btnVolverMenu;
-    private final JPanel panelAcciones;
+    private JPanel panelAcciones;
 
     // Visuales por personaje
-    private JPanel[] panelHeroesUI;
-    private JLabel[] lblHeroeNombre;
+    private JPanel[] panelHeroesPanels;
+    private JLabel[] lblHeroeNombres;
     private JProgressBar[] barraHpHeroes;
-    private JProgressBar[] barraMpHeroes;
 
-    private JPanel[] panelEnemigosUI;
-    private JLabel[] lblEnemigoNombre;
+    private JPanel[] panelEnemigosPanels;
+    private JLabel[] lblEnemigoNombres;
     private JProgressBar[] barraHpEnemigos;
-    private JProgressBar[] barraMpEnemigos;
-
-    // private final JPanel[] panelHeroesUI;
-    // private final JLabel[] lblHeroeNombre;
-    // private final JProgressBar[] barraHpHeroes;
-
-    // private final JPanel[] panelEnemigosUI;
-    // private final JLabel[] lblEnemigoNombre;
-    // private final JProgressBar[] barraHpEnemigos;
 
     // Turnos
     private int indiceHeroeActual = 0; // índice del héroe que debe actuar
@@ -135,33 +128,32 @@ public class VistaIniciarBatallaNueva extends JFrame {
                 }
 
                 // Inicializar arrays UI acorde a tamaños del modelo
-                Heroe[] heroes = batalla.getEquipoHeroes();
-                Enemigo[] enemigos = batalla.getEquipoEnemigos();
+                                Heroe[] heroes = batalla.getEquipoHeroes();
+                                if (heroes == null) heroes = new Heroe[0];
+                                Enemigo[] enemigos = batalla.getEquipoEnemigos();
+                                if (enemigos == null) enemigos = new Enemigo[0];
+                
+                                this.panelHeroesPanels = new JPanel[heroes.length];
+                                this.lblHeroeNombres = new JLabel[heroes.length];
+                                this.barraHpHeroes = new JProgressBar[heroes.length];
 
-                panelHeroesUI = new JPanel[heroes.length];
-                lblHeroeNombre = new JLabel[heroes.length];
-                barraHpHeroes = new JProgressBar[heroes.length];
-                barraMpHeroes = new JProgressBar[heroes.length];
-
-                panelEnemigosUI = new JPanel[enemigos.length];
-                lblEnemigoNombre = new JLabel[enemigos.length];
-                barraHpEnemigos = new JProgressBar[enemigos.length];
-                barraMpEnemigos = new JProgressBar[enemigos.length];
-
+                                this.panelEnemigosPanels = new JPanel[enemigos.length];
+                                this.lblEnemigoNombres = new JLabel[enemigos.length];
+                                this.barraHpEnemigos = new JProgressBar[enemigos.length];
 
                 // Construir UI de héroes
-                for (int i = 0; i < heroes.length; i++) {
-                    JPanel p = crearPanelPersonaje(true, i);
-                    panelHeroesUI[i] = p;
-                    panelEstado.add(p);
-                }
+                                for (int i = 0; i < heroes.length; i++) {
+                                    JPanel p = crearPanelPersonaje(true, i);
+                                    this.panelHeroesPanels[i] = p;
+                                    panelEstado.add(p);
+                                }
 
                 // Construir UI de enemigos
-                for (int i = 0; i < enemigos.length; i++) {
-                    JPanel p = crearPanelPersonaje(false, i);
-                    panelEnemigosUI[i] = p;
-                    panelEstado.add(p);
-                }
+                                for (int i = 0; i < enemigos.length; i++) {
+                                    JPanel p = crearPanelPersonaje(false, i);
+                                    this.panelEnemigosPanels[i] = p;
+                                    panelEstado.add(p);
+                                }
 
                 // Panel derecho inferior de acciones
                 this.panelAcciones = crearPanelAcciones();
@@ -212,25 +204,8 @@ public class VistaIniciarBatallaNueva extends JFrame {
                 lblNombre.setForeground(Color.WHITE);
                 lblNombre.setFont(new Font("Arial", Font.BOLD, 12));
 
-                JPanel panelBarras = new JPanel();
-                panelBarras.setLayout(new BoxLayout(panelBarras, BoxLayout.Y_AXIS));
-                panelBarras.setOpaque(false);
-
-                JProgressBar barra = new JProgressBar(0,100);
-                //barra.setValue(80);
+                JProgressBar barra = new JProgressBar();
                 barra.setStringPainted(true);
-                barra.setForeground(Color.BLUE);
-                barra.setBackground(Color.DARK_GRAY);
-                panelBarras.add(barra);
-
-                
-
-                JProgressBar barra2 = new JProgressBar(0,300);
-                //barra2.setValue(60);
-                barra2.setStringPainted(true);
-                barra2.setForeground(Color.RED);
-                barra2.setBackground(Color.DARK_GRAY);
-                panelBarras.add(barra2);
 
                 JLabel lblIcon = new JLabel();
                 lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
@@ -276,12 +251,11 @@ public class VistaIniciarBatallaNueva extends JFrame {
 
                 panel.add(lblIcon, BorderLayout.CENTER);
                 panel.add(lblNombre, BorderLayout.NORTH);
-                panel.add(panelBarras, BorderLayout.SOUTH);
+                panel.add(barra, BorderLayout.SOUTH);
 
                 if (esHeroe) {
-                    lblHeroeNombre[idx] = lblNombre;
-                    barraHpHeroes[idx] = barra;
-                    barraMpHeroes[idx] = barra2;
+                    this.lblHeroeNombres[idx] = lblNombre;
+                    this.barraHpHeroes[idx] = barra;
                     panel.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -296,9 +270,8 @@ public class VistaIniciarBatallaNueva extends JFrame {
                         }
                     });
                 } else {
-                    lblEnemigoNombre[idx] = lblNombre;
+                    lblEnemigoNombres[idx] = lblNombre;
                     barraHpEnemigos[idx] = barra;
-                    barraMpEnemigos[idx] = barra2;
                     panel.addMouseListener(new MouseAdapter() {
                         @Override
                         public void mouseClicked(MouseEvent e) {
@@ -322,7 +295,6 @@ public class VistaIniciarBatallaNueva extends JFrame {
              * Retorna:
              * - JPanel con la botonera totalmente configurada.
              */
-
             private JPanel crearPanelAcciones() {
                 JPanel panel = new JPanel(new FlowLayout(FlowLayout.LEFT));
                 panel.setBackground(new Color(20, 20, 30));
@@ -644,47 +616,39 @@ public class VistaIniciarBatallaNueva extends JFrame {
             private void ejecutarTurnoEnemigos() {
                 appendLog("--- Turno de los enemigos ---");
 
-                // Usar un Timer para espaciar las acciones de los enemigos en lugar de
-                // bloquear el hilo con Thread.sleep dentro de un bucle.
-                Enemigo[] enemigos = batalla.getEquipoEnemigos();
-                final int[] indice = {0};
-
-                javax.swing.Timer timer = new javax.swing.Timer(600, null);
-                timer.addActionListener(ev -> {
-                    // Avanzar hasta el siguiente enemigo vivo
-                    while (indice[0] < enemigos.length && (enemigos[indice[0]] == null || !enemigos[indice[0]].esta_vivo())) {
-                        indice[0]++;
+                SwingWorker<Void, Void> worker = new SwingWorker<>() {
+                    @Override
+                    protected Void doInBackground() throws Exception {
+                        Enemigo[] enemigos = batalla.getEquipoEnemigos();
+                        for (Enemigo e : enemigos) {
+                            if (e != null && e.esta_vivo()) {
+                                appendLog("El enemigo " + e.getNombre() + " está actuando...");
+                                if (e instanceof JefeEnemigo) {
+                                    ((JefeEnemigo) e).actuar(batalla.getEquipoHeroes());
+                                } else {
+                                    e.atacarAleatorio(batalla.getEquipoHeroes());
+                                }
+                                Thread.sleep(600);
+                                SwingUtilities.invokeLater(() -> refreshUI());
+                                if (comprobarVictoria()) return null;
+                            }
+                        }
+                        return null;
                     }
 
-                    if (indice[0] >= enemigos.length) {
-                        // Terminar el turno de enemigos y pasar el turno a los héroes
-                        timer.stop();
+                    @Override
+                    protected void done() {
+                        try {
+                            get();
+                        } catch (InterruptedException | ExecutionException ex) {
+                            appendLog("Error en turno de enemigos: " + ex.getMessage());
+                        }
                         indiceHeroeActual = buscarSiguienteHeroeVivo(0);
                         if (indiceHeroeActual >= 0) iniciarTurnoHeroe(indiceHeroeActual);
-                        return;
                     }
+                };
 
-                    Enemigo e = enemigos[indice[0]];
-                    appendLog("El enemigo " + e.getNombre() + " está actuando...");
-                    if (e instanceof JefeEnemigo jefeEnemigo) {
-                        jefeEnemigo.actuar(batalla.getEquipoHeroes());
-                    } else {
-                        e.atacarAleatorio(batalla.getEquipoHeroes());
-                    }
-
-                    // Refrescar la UI y comprobar victoria después de la acción
-                    refreshUI();
-                    if (comprobarVictoria()) {
-                        timer.stop();
-                        return;
-                    }
-
-                    // Prepararse para el siguiente enemigo en el siguiente tick
-                    indice[0]++;
-                });
-
-                timer.setInitialDelay(0);
-                timer.start();
+                worker.execute();
             }
 
             /**
@@ -727,19 +691,14 @@ public class VistaIniciarBatallaNueva extends JFrame {
                 for (int i = 0; i < heroes.length; i++) {
                     Heroe h = heroes[i];
                     if (h != null) {
-                        lblHeroeNombre[i].setText(h.getNombre() + " (" + h.getTipo().name() + ")");
+                        lblHeroeNombres[i].setText(h.getNombre() + " (" + h.getTipo().name() + ")");
                         int max = Math.max(1, h.getHp());
-                        int max2 = Math.max(1,h.getMp());
                         barraHpHeroes[i].setMaximum(max);
                         barraHpHeroes[i].setValue(Math.max(0, h.getHp()));
                         barraHpHeroes[i].setString(h.getHp() + " HP");
-                        barraMpHeroes[i].setMaximum(max2);
-                        barraMpHeroes[i].setValue(Math.max(0, h.getMp()));
-                        barraMpHeroes[i].setString(h.getMp() + "MP");
                     } else {
-                        lblHeroeNombre[i].setText("Vacío");
+                        lblHeroeNombres[i].setText("Vacío");
                         barraHpHeroes[i].setValue(0);
-                        barraMpHeroes[i].setValue(0);
                     }
                 }
 
@@ -747,19 +706,14 @@ public class VistaIniciarBatallaNueva extends JFrame {
                 for (int i = 0; i < enemigos.length; i++) {
                     Enemigo e = enemigos[i];
                     if (e != null) {
-                        lblEnemigoNombre[i].setText(e.getNombre() + " (" + e.getTipo().name() + ")");
+                        lblEnemigoNombres[i].setText(e.getNombre() + " (" + e.getTipo().name() + ")");
                         int max = Math.max(1, e.getHp());
-                        int max2 =  Math.max(1, e.getMp());
                         barraHpEnemigos[i].setMaximum(max);
                         barraHpEnemigos[i].setValue(Math.max(0, e.getHp()));
                         barraHpEnemigos[i].setString(e.getHp() + " HP");
-                        barraMpEnemigos[i].setMaximum(max2);
-                        barraMpEnemigos[i].setValue(Math.max(0, e.getMp()));
-                        barraMpEnemigos[i].setString(e.getMp() + "MP");
                     } else {
-                        lblEnemigoNombre[i].setText("Vacío");
+                        lblEnemigoNombres[i].setText("Vacío");
                         barraHpEnemigos[i].setValue(0);
-                        barraMpEnemigos[i].setValue(0);
                     }
                 }
             }
@@ -781,6 +735,3 @@ public class VistaIniciarBatallaNueva extends JFrame {
                 });
             }
         }
-        
-
-

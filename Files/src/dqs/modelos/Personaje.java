@@ -42,7 +42,9 @@ public abstract class Personaje {
         this.esta_vivo = hp > 0;
     }
     public void recibir_daño(int cantidad){
-        int dañoFinal = cantidad;
+        
+        /*int dañoFinal = cantidad;*/
+        int dañoFinal;
         
         // Si está siendo defendido por un tanque, aplicar defensa combinada
         if (siendo_defendido && defensor != null && defensor.esta_vivo()) {

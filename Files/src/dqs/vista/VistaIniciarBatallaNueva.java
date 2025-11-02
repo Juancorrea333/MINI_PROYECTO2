@@ -28,13 +28,14 @@ public class VistaIniciarBatallaNueva extends JFrame {
     private JLabel[] lblEnemigoNombre;
     private JProgressBar[] barraHpEnemigos;
     private JProgressBar[] barraMpEnemigos;
-    private final JPanel[] panelHeroesUI;
-    private final JLabel[] lblHeroeNombre;
-    private final JProgressBar[] barraHpHeroes;
 
-    private final JPanel[] panelEnemigosUI;
-    private final JLabel[] lblEnemigoNombre;
-    private final JProgressBar[] barraHpEnemigos;
+    // private final JPanel[] panelHeroesUI;
+    // private final JLabel[] lblHeroeNombre;
+    // private final JProgressBar[] barraHpHeroes;
+
+    // private final JPanel[] panelEnemigosUI;
+    // private final JLabel[] lblEnemigoNombre;
+    // private final JProgressBar[] barraHpEnemigos;
 
     // Turnos
     private int indiceHeroeActual = 0; // índice del héroe que debe actuar

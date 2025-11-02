@@ -137,23 +137,23 @@ public class Batalla {
     //         System.out.println(" Posición inválida.");
     //     }
     // }
-    public void crearHeroeInteractivo(java.util.Scanner scanner) {
-        System.out.print("Ingrese la posición (1-4): ");
-        int posicion;
-        try {
-            String line = scanner.nextLine();
-            posicion = Integer.parseInt(line) - 1;
-        } catch (NumberFormatException e) {
-            System.out.println(" Posición inválida (entrada no numérica).");
-            return;
-        }
+    // public void crearHeroeInteractivo(java.util.Scanner scanner) {
+    //     System.out.print("Ingrese la posición (1-4): ");
+    //     int posicion;
+    //     try {
+    //         String line = scanner.nextLine();
+    //         posicion = Integer.parseInt(line) - 1;
+    //     } catch (NumberFormatException e) {
+    //         System.out.println(" Posición inválida (entrada no numérica).");
+    //         return;
+    //     }
 
-        if (posicion >= 0 && posicion < equipoHeroes.length) {
-            crearYAgregarHeroe(posicion);
-        } else {
-            System.out.println(" Posición inválida.");
-        }
-    }
+    //     if (posicion >= 0 && posicion < equipoHeroes.length) {
+    //         crearYAgregarHeroe(posicion);
+    //     } else {
+    //         System.out.println(" Posición inválida.");
+    //     }
+    // }
 
     // Método para crear todo el equipo de enemigos
     public void crearEquipoEnemigos() {

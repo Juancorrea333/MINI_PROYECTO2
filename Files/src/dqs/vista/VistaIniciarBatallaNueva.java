@@ -1,12 +1,10 @@
 package dqs.vista;
 
 import dqs.modelos.*;
-
-import javax.swing.*;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.util.concurrent.ExecutionException;
+import javax.swing.*;
 import javax.swing.border.LineBorder;
 
 /**
@@ -19,16 +17,16 @@ public class VistaIniciarBatallaNueva extends JFrame {
     private JPanel panelEstado;
     private JTextArea areaLog;
     private JButton btnVolverMenu;
-    private JPanel panelAcciones;
+    private final JPanel panelAcciones;
 
     // Visuales por personaje
-    private JPanel[] panelHeroesPanels;
-    private JLabel[] lblHeroeNombres;
-    private JProgressBar[] barraHpHeroes;
+    private final JPanel[] panelHeroesPanels;
+    private final JLabel[] lblHeroeNombres;
+    private final JProgressBar[] barraHpHeroes;
 
-    private JPanel[] panelEnemigosPanels;
-    private JLabel[] lblEnemigoNombres;
-    private JProgressBar[] barraHpEnemigos;
+    private final JPanel[] panelEnemigosPanels;
+    private final JLabel[] lblEnemigoNombres;
+    private final JProgressBar[] barraHpEnemigos;
 
     // Turnos
     private int indiceHeroeActual = 0; // índice del héroe que debe actuar
@@ -598,57 +596,54 @@ public class VistaIniciarBatallaNueva extends JFrame {
             }
 
             /**
-             * Ejecuta el turno de los enemigos en un hilo background (SwingWorker)
-             * para no bloquear la EDT.
+             * Ejecuta el turno de los enemigos usando un javax.swing.Timer para no
+             * bloquear la EDT ni llamar a Thread.sleep en un bucle.
              *
              * Flujo:
              * - Itera los enemigos vivos y llama a su método de acción
-             *   (`actuar` en jefes o `atacarAleatorio` en normales).
-             * - Tras cada acción duerme brevemente (Thread.sleep) y solicita
-             *   refrescar la UI en la EDT.
-             * - Si detecta victoria durante el proceso, aborta el resto de
-             *   acciones.
-             * - Al terminar, reinicia el flujo de turnos pasando de nuevo a los
-             *   héroes (buscando el primer héroe vivo).
-             *
-             * Nota: maneja excepciones y registra errores en el log.
+             *   (`actuar` en jefes o `atacarAleatorio` en normales) en intervalos
+             *   regulares definidos por el temporizador.
+             * - Tras cada acción refresca la UI y comprueba victoria; si hay ganador
+             *   detiene el temporizador y no continúa.
+             * - Al finalizar todos los enemigos, reinicia el turno de los héroes.
              */
             private void ejecutarTurnoEnemigos() {
                 appendLog("--- Turno de los enemigos ---");
 
-                SwingWorker<Void, Void> worker = new SwingWorker<>() {
-                    @Override
-                    protected Void doInBackground() throws Exception {
-                        Enemigo[] enemigos = batalla.getEquipoEnemigos();
-                        for (Enemigo e : enemigos) {
-                            if (e != null && e.esta_vivo()) {
-                                appendLog("El enemigo " + e.getNombre() + " está actuando...");
-                                if (e instanceof JefeEnemigo) {
-                                    ((JefeEnemigo) e).actuar(batalla.getEquipoHeroes());
-                                } else {
-                                    e.atacarAleatorio(batalla.getEquipoHeroes());
-                                }
-                                Thread.sleep(600);
-                                SwingUtilities.invokeLater(() -> refreshUI());
-                                if (comprobarVictoria()) return null;
+                Enemigo[] enemigos = batalla.getEquipoEnemigos();
+                final java.util.concurrent.atomic.AtomicInteger indice = new java.util.concurrent.atomic.AtomicInteger(0);
+
+                javax.swing.Timer timer = new javax.swing.Timer(600, null);
+                timer.addActionListener(ev -> {
+                    int i = indice.getAndIncrement();
+                    if (i < enemigos.length) {
+                        Enemigo e = enemigos[i];
+                        if (e != null && e.esta_vivo()) {
+                            appendLog("El enemigo " + e.getNombre() + " está actuando...");
+                            if (e instanceof JefeEnemigo jefeEnemigo) {
+                                jefeEnemigo.actuar(batalla.getEquipoHeroes());
+                            } else {
+                                e.atacarAleatorio(batalla.getEquipoHeroes());
+                            }
+                            // Actualizar UI después de la acción
+                            refreshUI();
+                            if (comprobarVictoria()) {
+                                timer.stop();
+                                return;
                             }
                         }
-                        return null;
                     }
 
-                    @Override
-                    protected void done() {
-                        try {
-                            get();
-                        } catch (InterruptedException | ExecutionException ex) {
-                            appendLog("Error en turno de enemigos: " + ex.getMessage());
-                        }
+                    // Si ya procesamos todos los enemigos, detener timer y pasar turno a héroes
+                    if (i >= enemigos.length - 1) {
+                        timer.stop();
                         indiceHeroeActual = buscarSiguienteHeroeVivo(0);
                         if (indiceHeroeActual >= 0) iniciarTurnoHeroe(indiceHeroeActual);
                     }
-                };
+                });
 
-                worker.execute();
+                timer.setInitialDelay(0);
+                timer.start();
             }
 
             /**

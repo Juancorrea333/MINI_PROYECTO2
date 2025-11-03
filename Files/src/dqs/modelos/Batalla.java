@@ -126,7 +126,7 @@ public class Batalla {
          try {
              String line = scanner.nextLine();
              posicion = Integer.parseInt(line) - 1;
-         } catch (Exception e) {
+         } catch (NumberFormatException e) {
              System.out.println(" Posición inválida (entrada no numérica).");
              return;
          }

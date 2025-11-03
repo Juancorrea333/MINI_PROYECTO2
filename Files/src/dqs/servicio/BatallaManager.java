@@ -1,11 +1,10 @@
 package dqs.servicio;
 
+import dqs.modelos.*;
 import java.util.Scanner;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
-
-import dqs.modelos.*;
 
 /**
  * Clase encargada de orquestar la simulación de una batalla.
@@ -69,9 +68,9 @@ public class BatallaManager {
 
                         // Si el enemigo es un jefe con comportamiento especial, delegar en su actuar
                         try {
-                            if (eFinal instanceof dqs.modelos.JefeEnemigo) {
+                            if (eFinal instanceof dqs.modelos.JefeEnemigo jefeEnemigo) {
                                 // JefeEnemigo.actuar maneja cooldowns y usa la habilidad especial cada N turnos
-                                ((dqs.modelos.JefeEnemigo)eFinal).actuar(batalla.getEquipoHeroes());
+                                jefeEnemigo.actuar(batalla.getEquipoHeroes());
                             } else {
                                 // Enemigos normales atacan a un héroe vivo aleatorio
                                 eFinal.atacarAleatorio(batalla.getEquipoHeroes());
